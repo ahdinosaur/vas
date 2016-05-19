@@ -1,0 +1,56 @@
+{
+  "name": "chur",
+  "version": "0.0.0",
+  "description": "simple composable data services using muxrpc",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*.js",
+    "example:server": "node-dev example/server.js",
+    "example:browser": "budo example:bundle.js -d example --live -- -d",
+    "bundle": "browserify example -g envify -g uglifyify",
+    "build": "npm run --silent bundle -- -o example/bundle.js",
+    "disc": "npm run --silent bundle -- --full-paths | discify --open"
+  },
+  "browserify": {
+    "transform": []
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahdinosaur/chur.git"
+  },
+  "keywords": [
+    "simple",
+    "composable",
+    "data",
+    "service",
+    "micro",
+    "muxrpc",
+    "stream",
+    "pull",
+    "pull-stream"
+  ],
+  "author": "Mikey <michael.williams@enspiral.com> (http://dinosaur.is)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ahdinosaur/chur/issues"
+  },
+  "homepage": "https://github.com/ahdinosaur/chur#readme",
+  "devDependencies": {
+    "browserify": "^13.0.0",
+    "budo": "^8.1.0",
+    "disc": "^1.3.2",
+    "envify": "^3.4.0",
+    "gh-pages": "^0.11.0",
+    "npm-run-all": "^1.6.0",
+    "tape": "^4.5.1",
+    "uglifyify": "^3.0.1",
+    "watchify": "^3.7.0"
+  },
+  "dependencies": {
+    "muxrpc": "^6.3.3",
+    "muxrpcli": "^1.0.5",
+    "pull-serializer": "^0.3.2",
+    "pull-ws-server": "^1.8.0",
+    "set-in": "^1.1.1"
+  }
+}
