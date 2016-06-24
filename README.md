@@ -1,14 +1,16 @@
-# chur
+# vas
 
 simple composable data services using [muxrpc](https://github.com/ssbc/muxrpc)
 
 **work in progress**
 
 ```shell
-npm install --save ahdinosaur/chur
+npm install --save ahdinosaur/vas
 ```
 
 for a user interface complement, see [`inu`](https://github.com/ahdinosaur/inu)
+
+![human vasculatory system](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Circulatory_System_no_tags.svg/259px-Circulatory_System_no_tags.svg.png)
 
 ## example
 
@@ -16,9 +18,9 @@ see [./example](./example)
 
 ## usage
 
-a `chur` service is a definition for a duplex stream that could respond to requests.
+a `vas` service is a definition for a duplex stream that could respond to requests.
 
-a `chur` service is defined by an object with the following keys:
+a `vas` service is defined by an object with the following keys:
 
 - `name`: a string name
 - `version` (optional): a string semantic version
@@ -27,17 +29,17 @@ a `chur` service is defined by an object with the following keys:
 - `init`: a `init(server, config)` pure function that returns an object of method functions to pass into [`muxrpc`](https://github.com/ssbc/muxrpc)
 - `services`: any recursive sub-services of this one
 
-### `chur = require('chur')`
+### `vas = require('vas')`
 
-the top-level `chur` module is a grab bag of all `chur/*` modules.
+the top-level `vas` module is a grab bag of all `vas/*` modules.
 
-you can also require each module separately like `require('chur/createServer')`.
+you can also require each module separately like `require('vas/createServer')`.
 
-### `server = chur.createServer(service, config)`
+### `server = vas.createServer(service, config)`
 
-a `chur` server is an instantiation of a service that responds to requests.
+a `vas` server is an instantiation of a service that responds to requests.
 
-returns a `chur` server defined by an object with the following keys:
+returns a `vas` server defined by an object with the following keys:
 
 - `name`: a string name
 - `version` (optional): a string semantic version
@@ -50,17 +52,17 @@ returns a `chur` server defined by an object with the following keys:
 
 returns a [duplex pull stream](https://github.com/dominictarr/pull-stream-examples/blob/master/duplex.js) using [`muxrpc`](https://github.com/ssbc/muxrpc)
 
-### `chur.listen(server, options)`
+### `vas.listen(server, options)`
 
 listens to a port and begins to handle requests from clients using [`pull-ws-server`](https://github.com/pull-stream/pull-ws-server)
 
-### `chur.command(server, options)`
+### `vas.command(server, options)`
 
 run a command on a server as a command-line interface using [`muxrpcli`](https://github.com/ssbc/muxrpcli)
 
-### `client = chur.createClient(manifest, config)`
+### `client = vas.createClient(manifest, config)`
 
-a `chur` client is a composition of manifests to makes requests.
+a `vas` client is a composition of manifests to makes requests.
 
 - `name`: a string name
 - `version` (optional): a string semantic version
@@ -71,7 +73,7 @@ a `chur` client is a composition of manifests to makes requests.
 
 returns a [duplex pull stream](https://github.com/dominictarr/pull-stream-examples/blob/master/duplex.js) using [`muxrpc`](https://github.com/ssbc/muxrpc)
 
-### `chur.connect(client, options)`
+### `vas.connect(client, options)`
 
 connects the client to a server over websockets using [`pull-ws-server`](https://github.com/pull-stream/pull-ws-server)
 
