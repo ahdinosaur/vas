@@ -10,7 +10,7 @@ module.exports = {
   },
   port: 5000,
   url: {
-    protocol: 'http',
+    protocol: 'ws',
     hostname: 'localhost',
     port: 5000
   }
