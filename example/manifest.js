@@ -1,4 +1,4 @@
-var api = require('./api')
+var api = require('./services/')
 var manifest = {}
 
 Object.keys(api).forEach(function (name) {
