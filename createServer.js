@@ -2,6 +2,7 @@ var muxrpc = require('muxrpc')
 var setIn = require('set-in')
 
 var serialize = require('./serialize')
+var walkApi = require('./walkApi')
 
 module.exports = createServer
 
@@ -34,14 +35,3 @@ function createServer (api, config) {
   }
 }
 
-function walkApi (api, cb, path) {
-  path = path || []
-  Object.keys(api).forEach(function (name) {
-    var service = api[name]
-    var servicePath = path.concat([name])
-    cb(service, servicePath)
-    if (service.api) {
-      walkApi(api, cb, servicePath)
-    }
-  })
-}
