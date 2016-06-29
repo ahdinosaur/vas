@@ -6,7 +6,8 @@
   "scripts": {
     "test": "tape test/*.js",
     "example:server": "node-dev example/server.js",
-    "example:browser": "budo example:bundle.js -d example --live -- -d",
+    "example:browser": "budo example/browser:bundle.js -d example --live -- -d",
+    "example": "npm-run-all -p example:*",
     "bundle": "browserify example -g envify -g uglifyify",
     "build": "npm run --silent bundle -- -o example/bundle.js",
     "disc": "npm run --silent bundle -- --full-paths | discify --open"
@@ -41,6 +42,7 @@
     "disc": "^1.3.2",
     "envify": "^3.4.0",
     "gh-pages": "^0.11.0",
+    "node-dev": "^3.1.3",
     "npm-run-all": "^1.6.0",
     "tape": "^4.5.1",
     "uglifyify": "^3.0.1",
