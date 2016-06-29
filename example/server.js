@@ -1,8 +1,8 @@
-var chur = require('../')
+var vas = require('../')
 
-var service = require('./service')
+var service = require('./services/')
 var config = require('./config')
 
-var server = chur.createServer(service)
+var server = vas.createServer(service, config)
 
-listen(server, config)
+var ws = vas.listen(server, config)

@@ -3,5 +3,6 @@ module.exports = {
   createClient: require('./createClient'),
   listen: require('./listen'),
   command: require('./command'),
-  connect: require('./connect')
+  connect: require('./connect'),
+  pull: require('pull-stream')
 }
