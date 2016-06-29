@@ -1,11 +1,21 @@
-var pull = require('pull-stream')
-var Ws = require('pull-ws-server')
-var Url= require('url')
+const pull = require('pull-stream')
+const Ws = require('pull-ws-server/client')
+const Url= require('url')
+
+const createClient = require('./createClient')
 
 module.exports = connect
 
-function connect (client, config) {
-  var stream = Ws.connect(getUrl(config), config)
+function connect (api, config, cb) {
+  const client = createClient(api, config)
+  const stream = Ws.connect(
+    getUrl(config),
+    (err, stream) => {
+      if (!cb) return
+      if (err) cb(err)
+      else cb(null, client)
+    }
+  )
 
   pull(
     stream,

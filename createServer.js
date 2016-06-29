@@ -1,37 +1,34 @@
-var muxrpc = require('muxrpc')
-var setIn = require('set-in')
+const muxrpc = require('muxrpc')
+const setIn = require('set-in')
 
-var serialize = require('./serialize')
-var walkApi = require('./walkApi')
+const serialize = require('./serialize')
+const walk = require('./walk')
 
 module.exports = createServer
 
-function createServer (api, config) {
-
+function createServer (services, config) {
   var manifest = {}
   var permissions = {}
-  var local = {}
+  var methods = {}
 
-  walkApi(api, function (service, path) {
+  walk(services, function (service, path) {
     // merge manifest
     setIn(manifest, path, service.manifest)
     // merge permissions
     setIn(permissions, path, service.permissions)
-    // merge local by calling service.init(api, config)
-    setIn(local, path, service.init(api, config))
+    // merge methods by calling service.init(service, config)
+    setIn(methods, path, service.init && service.init(service, config))
   })
-  return {
-    createRpc,
-    createStream
+
+  return Object.assign({ createStream }, methods)
+
+  function createStream() {
+    return createRpc().createStream()
   }
 
   function createRpc () {
     var Rpc = muxrpc(null, manifest, serialize)
-    return Rpc(local, permissions)
-  }
-
-  function createStream() {
-    return createRpc().createStream()
+    return Rpc(methods, permissions)
   }
 }
 

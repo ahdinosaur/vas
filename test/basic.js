@@ -5,27 +5,25 @@ var pull = vas.pull
 
 test('can create a client and server streams', function(t) {
   var expected = ["Timmy", "Bob"]
-  var services = {
-    people: {
-      name: 'people',
-      version: '0.0.0',
-      permissions: function (path, args) {},
-      manifest: {
-        find: 'source' 
-      },
-      init: function (server, config) {
-        return { find }
+  var service = {
+    name: 'people',
+    version: '0.0.0',
+    permissions: function (path, args) {},
+    manifest: {
+      find: 'source' 
+    },
+    init: function (server, config) {
+      return { find }
 
-        function find () {
-          return pull.values(expected)
-        }
+      function find () {
+        return pull.values(expected)
       }
     }
   }
 
 
-  var client = vas.createClient(services, {})
-  var server = vas.createServer(services, {}) 
+  var client = vas.createClient(service, {})
+  var server = vas.createServer(service, {}) 
 
   var clientStream = client.createStream()
   var serverStream = server.createStream()

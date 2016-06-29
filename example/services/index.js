@@ -1,3 +1,3 @@
-module.exports = {
-  things: require('./things')
-}
+module.exports = [
+  require('./things')
+]

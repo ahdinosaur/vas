@@ -7,7 +7,8 @@
     "test": "tape test/*.js",
     "example:server": "node-dev example/server.js",
     "example:browser": "budo example/browser:bundle.js -d example --live -- -d",
-    "example": "npm-run-all -p example:*",
+    "example:cli": "node example/cli",
+    "example": "npm-run-all -p example:server example:browser",
     "bundle": "browserify example -g envify -g uglifyify",
     "build": "npm run --silent bundle -- -o example/bundle.js",
     "disc": "npm run --silent bundle -- --full-paths | discify --open"
@@ -49,10 +50,14 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
+    "budo": "^8.3.0",
+    "envify": "^3.4.1",
     "muxrpc": "^6.3.3",
     "muxrpcli": "^1.0.5",
     "pull-serializer": "^0.3.2",
-    "pull-ws-server": "^1.8.0",
-    "set-in": "^1.1.1"
+    "pull-ws-server": "^1.9.3",
+    "set-in": "^1.1.1",
+    "tape": "^4.6.0",
+    "uglifyify": "^3.0.2"
   }
 }

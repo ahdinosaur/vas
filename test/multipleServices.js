@@ -7,8 +7,8 @@ test('can create client and server streams with multiple services', function(t) 
   t.plan(2)
   var expectedPeople = ["Timmy", "Bob"]
   var expectedCats = ["Fluffy", "Meow"]
-  var services = {
-    cats: {
+  var services = [
+    {
       name: 'cats',
       version: '0.0.0',
       permissions: function (path, args) {},
@@ -23,7 +23,7 @@ test('can create client and server streams with multiple services', function(t) 
         }
       }
     },
-    people: {
+    {
       name: 'people',
       version: '0.0.0',
       permissions: function (path, args) {},
@@ -38,7 +38,7 @@ test('can create client and server streams with multiple services', function(t) 
         }
       }
     }
-  }
+  ]
 
 
   var client = vas.createClient(services, {})

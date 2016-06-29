@@ -1,15 +1,15 @@
-var muxrpc = require('muxrpc')
-var setIn = require('set-in')
+const muxrpc = require('muxrpc')
+const setIn = require('set-in')
 
-var defaultSerialize = require('./serialize')
-var walkApi = require('./walkApi')
+const defaultSerialize = require('./serialize')
+const walk = require('./walk')
 
 module.exports = createClient
 
-function createClient (api, config) {
+function createClient (services, config) {
   var manifest = {}
 
-  walkApi(api, function (service, path) {
+  walk(services, function (service, path) {
     // merge manifest
     setIn(manifest, path, service.manifest)
   })

@@ -27,7 +27,7 @@ a `vas` service is defined by an object with the following keys:
 - `manifest`: an object [muxrpc manifest](https://github.com/ssbc/muxrpc#manifest)
 - `permissions`: an object [muxrpc permissions](https://github.com/ssbc/muxrpc#permissions)
 - `init`: a `init(server, config)` pure function that returns an object of method functions to pass into [`muxrpc`](https://github.com/ssbc/muxrpc)
-- `services`: any recursive sub-services of this one
+- `services`: any recursive sub-services, represented as an `Array` of services
 
 ### `vas = require('vas')`
 
@@ -35,47 +35,41 @@ the top-level `vas` module is a grab bag of all `vas/*` modules.
 
 you can also require each module separately like `require('vas/createServer')`.
 
-### `server = vas.createServer(service, config)`
+### `server = vas.createServer(services, config)`
 
 a `vas` server is an instantiation of a service that responds to requests.
 
-returns a `vas` server defined by an object with the following keys:
-
-- `name`: a string name
-- `version` (optional): a string semantic version
-- `manifest`: an object [`muxrpc` manifest](https://github.com/ssbc/muxrpc#manifest)
-- `permissions`: an object [`muxrpc` permissions](https://github.com/ssbc/muxrpc#permissions)
-- `methods`: pure functions that are wrapped by [`muxrpc`](https://github.com/ssbc/muxrpc)
-- `services`: any recursive services within this service
+`createServer` returns an object that corresponds to the (recursive) services and respective methods returned by `init`.
 
 ### `server.createStream()`
 
 returns a [duplex pull stream](https://github.com/dominictarr/pull-stream-examples/blob/master/duplex.js) using [`muxrpc`](https://github.com/ssbc/muxrpc)
 
-### `vas.listen(server, options)`
-
-listens to a port and begins to handle requests from clients using [`pull-ws-server`](https://github.com/pull-stream/pull-ws-server)
-
-### `vas.command(server, options)`
-
-run a command on a server as a command-line interface using [`muxrpcli`](https://github.com/ssbc/muxrpcli)
-
-### `client = vas.createClient(manifest, config)`
+### `client = vas.createClient(services, config)`
 
 a `vas` client is a composition of manifests to makes requests.
 
-- `name`: a string name
-- `version` (optional): a string semantic version
-- `manifest`: an object [muxrpc manifest](https://github.com/ssbc/muxrpc#manifest)
-- `services`: any recursive services within this service
+`createClient` returns an object that corresponds to the (rescursive) services and respective methods in `manifest`.
 
 ### `client.createStream()`
 
 returns a [duplex pull stream](https://github.com/dominictarr/pull-stream-examples/blob/master/duplex.js) using [`muxrpc`](https://github.com/ssbc/muxrpc)
 
-### `vas.connect(client, options)`
+### `vas.listen(services, config, options)`
+
+creates a server with `createServer(services, config)`, then
+
+listens to a port and begins to handle requests from clients using [`pull-ws-server`](https://github.com/pull-stream/pull-ws-server)
+
+### `vas.connect(client, config, options)`
+
+creates a client with `createClient(services, config)`, then
 
 connects the client to a server over websockets using [`pull-ws-server`](https://github.com/pull-stream/pull-ws-server)
+
+### `vas.command(services, config, argv)`
+
+run a command on a server as a command-line interface using [`muxrpcli`](https://github.com/ssbc/muxrpcli)
 
 ## inspiration
 

@@ -1,12 +1,15 @@
-var assert = require('assert')
-var pull = require('pull-stream')
-var Ws = require('pull-ws-server')
-var Url = require('url')
+const assert = require('assert')
+const pull = require('pull-stream')
+const Ws = require('pull-ws-server')
+const Url = require('url')
+
+const createServer = require('./createServer')
 
 module.exports = listen
 
-function listen (server, config) {
-  var ws = Ws.createServer(config, handler)
+function listen (api, config) {
+  const server = createServer(api, config)
+  const ws = Ws.createServer(config, handler)
 
   return ws.listen(config.port)
 

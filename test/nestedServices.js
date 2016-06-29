@@ -7,9 +7,22 @@ test('can create client and server streams with nested services', function(t) {
   t.plan(2)
     var expectedPeople = ["Timmy", "Bob"]
     var expectedCats = ["Fluffy", "Meow"]
-    var services = {
-      cats: {
-        name: 'cats',
+    var service = {
+      name: 'cats',
+      version: '0.0.0',
+      permissions: function (path, args) {},
+      manifest: {
+        find: 'source' 
+      },
+      init: function (server, config) {
+        return { find }
+
+        function find () {
+          return pull.values(expectedCats)
+        }
+      },
+      services: [{
+        name: 'people',
         version: '0.0.0',
         permissions: function (path, args) {},
         manifest: {
@@ -19,31 +32,14 @@ test('can create client and server streams with nested services', function(t) {
           return { find }
 
           function find () {
-            return pull.values(expectedCats)
-          }
-        },
-        services: {
-          people: {
-            name: 'people',
-            version: '0.0.0',
-            permissions: function (path, args) {},
-            manifest: {
-              find: 'source' 
-            },
-            init: function (server, config) {
-              return { find }
-
-              function find () {
-                return pull.values(expectedPeople)
-              }
-            }
+            return pull.values(expectedPeople)
           }
         }
-      }
+      }]
     }
 
-    var client = vas.createClient(services, {})
-    var server = vas.createServer(services, {}) 
+    var client = vas.createClient(service, {})
+    var server = vas.createServer(service, {}) 
     var clientStream = client.createStream()
     var serverStream = server.createStream()
 

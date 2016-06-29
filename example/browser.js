@@ -1,11 +1,12 @@
 var vas = require('../')
 var pull = vas.pull
 
-var service = require('./services/')
+var services = require('./services')
 var config = require('./config')
 
-var client = vas.createClient(service, config)
-vas.connect(client, config)
+var client = vas.connect(services, config)
+
+console.log('client', client)
 
 pull(
   client.things.find(),
