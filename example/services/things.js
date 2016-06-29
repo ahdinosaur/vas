@@ -1,4 +1,4 @@
-var pull = require('../').pull
+var pull = require('../../').pull
 
 module.exports = {
   name: 'things',
