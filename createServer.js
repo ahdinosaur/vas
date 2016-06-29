@@ -19,7 +19,6 @@ function createServer (api, config) {
     // merge local by calling service.init(api, config)
     setIn(local, path, service.init(api, config))
   })
-  console.log('creating server with manifest', manifest);
   return {
     createRpc,
     createStream

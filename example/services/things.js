@@ -8,7 +8,6 @@ module.exports = {
     find: 'source' 
   },
   init: function (server, config) {
-    console.log('in init with server, config', server, config);
     return { find }
 
     function find () {

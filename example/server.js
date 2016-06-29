@@ -5,6 +5,4 @@ var config = require('./config')
 
 var server = vas.createServer(service, config)
 
-
 var ws = vas.listen(server, config)
-console.log(ws);
