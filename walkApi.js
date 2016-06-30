@@ -4,8 +4,8 @@ module.exports = function walkApi (api, cb, path) {
     var service = api[name]
     var servicePath = path.concat([name])
     cb(service, servicePath)
-    if (service.api) {
-      walkApi(api, cb, servicePath)
+    if (service.services) {
+      walkApi(service.services, cb, servicePath)
     }
   })
 }
