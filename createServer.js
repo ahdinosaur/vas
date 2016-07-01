@@ -1,15 +1,20 @@
 const muxrpc = require('muxrpc')
 const setIn = require('set-in')
+const defined = require('defined')
 
-const serialize = require('./serialize')
+const defaultSerialize = require('./serialize')
 const walk = require('./walk')
 
 module.exports = createServer
 
-function createServer (services, config) {
-  const manifest = {}
-  const permissions = {}
-  const methods = {}
+function createServer (services, config, options) {
+  options = defined(options, {})
+
+  const serialize = defined(options.serialize, defaultSerialize)
+
+  var manifest = {}
+  var permissions = {}
+  var methods = {}
 
   walk(services, function (service, path) {
     // merge manifest

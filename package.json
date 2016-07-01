@@ -61,7 +61,7 @@
     "minimist": "^1.2.0",
     "muxrpc": "^6.3.3",
     "muxrpcli": "^1.0.5",
-    "pull-serializer": "^0.3.2",
+    "pull-json-doubleline": "github:ahdinosaur/pull-json-doubleline#v2",
     "pull-stream": "^3.4.3",
     "pull-ws-server": "^1.9.3",
     "set-in": "^1.1.1"

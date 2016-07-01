@@ -1,20 +1,23 @@
 var muxrpc = require('muxrpc')
 var setIn = require('set-in')
+var defined = require('defined')
 
 var defaultSerialize = require('./serialize')
 var walk = require('./walk')
 
 module.exports = createClient
 
-function createClient (services, config) {
+function createClient (services, config, options) {
+  options = defined(options, {})
+
+  var serialize = defined(options.serialize, defaultSerialize)
+
   var manifest = {}
 
   walk(services, function (service, path) {
     // merge manifest
     setIn(manifest, path, service.manifest)
   })
-
-  var serialize = config.serialize || defaultSerialize
 
   return muxrpc(manifest, null, serialize)()
 }
