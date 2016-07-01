@@ -5,10 +5,10 @@ module.exports = {
   version: '0.0.0',
   permissions: function (path, args) {},
   manifest: {
-    find: 'source' 
+    find: 'source'
   },
   init: function (server, config) {
-    return { find }
+    return { find: find }
 
     function find () {
       return pull.values(config.data)

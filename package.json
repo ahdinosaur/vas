@@ -4,7 +4,11 @@
   "description": "simple composable data services using muxrpc",
   "main": "index.js",
   "scripts": {
-    "test": "tape test/*.js",
+    "test:deps": "dependency-check . && dependency-check . --extra --no-dev",
+    "test:lint": "standard",
+    "test:node": "NODE_ENV=test tape test/*.js",
+    "test:coverage": "NODE_ENV=test istanbul cover test",
+    "test": "npm-run-all -s test:deps test:lint test:node",
     "example:server": "node-dev example/server.js",
     "example:browser": "budo example/browser:bundle.js -d example --live -- -d",
     "example:cli": "node example/cli",
@@ -40,24 +44,25 @@
   "devDependencies": {
     "browserify": "^13.0.0",
     "budo": "^8.1.0",
+    "dependency-check": "^2.5.1",
     "disc": "^1.3.2",
     "envify": "^3.4.0",
     "gh-pages": "^0.11.0",
+    "istanbul": "^0.4.4",
     "node-dev": "^3.1.3",
     "npm-run-all": "^1.6.0",
-    "tape": "^4.5.1",
+    "standard": "^7.1.2",
+    "tape": "^4.6.0",
     "uglifyify": "^3.0.1",
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "budo": "^8.3.0",
-    "envify": "^3.4.1",
+    "minimist": "^1.2.0",
     "muxrpc": "^6.3.3",
     "muxrpcli": "^1.0.5",
     "pull-serializer": "^0.3.2",
+    "pull-stream": "^3.4.3",
     "pull-ws-server": "^1.9.3",
-    "set-in": "^1.1.1",
-    "tape": "^4.6.0",
-    "uglifyify": "^3.0.2"
+    "set-in": "^1.1.1"
   }
 }

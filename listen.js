@@ -1,7 +1,5 @@
-const assert = require('assert')
 const pull = require('pull-stream')
 const Ws = require('pull-ws-server')
-const Url = require('url')
 
 const createServer = require('./createServer')
 

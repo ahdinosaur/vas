@@ -1,11 +1,11 @@
-# vas
+# vas [![stability][0]][1]
+[![npm version][2]][3] [![build status][4]][5] [![test coverage][6]][7]
+[![downloads][8]][9] [![js-standard-style][10]][11]
 
 simple composable data services using [muxrpc](https://github.com/ssbc/muxrpc)
 
-**work in progress**
-
 ```shell
-npm install --save ahdinosaur/vas
+npm install --save vas
 ```
 
 for a user interface complement, see [`inu`](https://github.com/ahdinosaur/inu)
@@ -67,7 +67,9 @@ creates a client with `createClient(services, config)`, then
 
 connects the client to a server over websockets using [`pull-ws-server`](https://github.com/pull-stream/pull-ws-server)
 
-### `vas.command(services, config, argv)`
+### TODO `vas.command(services, config, argv)`
+
+_not implemented yet_
 
 run a command on a server as a command-line interface using [`muxrpcli`](https://github.com/ssbc/muxrpcli)
 
@@ -94,3 +96,16 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+[0]: https://img.shields.io/badge/stability-experimental-orange.svg?style=flat-square
+[1]: https://nodejs.org/api/documentation.html#documentation_stability_index
+[2]: https://img.shields.io/npm/v/vas.svg?style=flat-square
+[3]: https://npmjs.org/package/vas
+[4]: https://img.shields.io/travis/ahdinosaur/vas/master.svg?style=flat-square
+[5]: https://travis-ci.org/ahdinosaur/vas
+[6]: https://img.shields.io/codecov/c/github/ahdinosaur/vas/master.svg?style=flat-square
+[7]: https://codecov.io/github/ahdinosaur/vas
+[8]: http://img.shields.io/npm/dm/vas.svg?style=flat-square
+[9]: https://npmjs.org/package/vas
+[10]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
+[11]: https://github.com/feross/standard

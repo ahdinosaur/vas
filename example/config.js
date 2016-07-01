@@ -3,8 +3,8 @@ module.exports = {
     things: {
       1: {
         id: 1,
-        name: "desk",
-        description: "clean and tidy, wait just kidding."
+        name: 'desk',
+        description: 'clean and tidy, wait just kidding.'
       }
     }
   },
@@ -15,4 +15,3 @@ module.exports = {
     port: 5000
   }
 }
-

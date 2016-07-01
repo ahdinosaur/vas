@@ -3,14 +3,14 @@ var test = require('tape')
 var vas = require('../')
 var pull = vas.pull
 
-test('can create a client and server streams', function(t) {
-  var expected = ["Timmy", "Bob"]
+test('can create a client and server streams', function (t) {
+  var expected = ['Timmy', 'Bob']
   var service = {
     name: 'people',
     version: '0.0.0',
     permissions: function (path, args) {},
     manifest: {
-      find: 'source' 
+      find: 'source'
     },
     init: function (server, config) {
       return { find }
@@ -21,25 +21,24 @@ test('can create a client and server streams', function(t) {
     }
   }
 
-
   var client = vas.createClient(service, {})
-  var server = vas.createServer(service, {}) 
+  var server = vas.createServer(service, {})
 
   var clientStream = client.createStream()
   var serverStream = server.createStream()
 
   pull(
-   clientStream,
-   serverStream,
-   clientStream
+    clientStream,
+    serverStream,
+    clientStream
   )
 
   pull(
     client.people.find(),
-    pull.collect(function(err, arr) {
-      t.deepEqual(arr, expected) 
+    pull.collect(function (err, arr) {
+      t.error(err)
+      t.deepEqual(arr, expected)
       t.end()
     })
   )
 })
-

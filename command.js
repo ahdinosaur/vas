@@ -11,13 +11,13 @@ function command (service, config, argv) {
   // config to the command.
   argv = argv.slice(2)
   const i = argv.indexOf('--')
-  const configArgs = argv.slice(i+1)
+  const configArgs = argv.slice(i + 1)
   argv = ~i ? argv.slice(0) : argv
 
   Object.assign(config, minimist(configArgs))
   console.log('config', config)
 
-  if (argv[0] == 'server') {
+  if (argv[0] === 'server') {
     // special server command:
     // start the server
     console.log('starting server')
@@ -27,7 +27,7 @@ function command (service, config, argv) {
     // create a client connection to the server
 
     // connect
-    connect(service, config, function (client) {
+    connect(service, config, function (err, client) {
       console.log('client', client)
       if (err) {
         if (/could not connect/.test(err.message)) {

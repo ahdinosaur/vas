@@ -7,9 +7,9 @@ const walk = require('./walk')
 module.exports = createServer
 
 function createServer (services, config) {
-  var manifest = {}
-  var permissions = {}
-  var methods = {}
+  const manifest = {}
+  const permissions = {}
+  const methods = {}
 
   walk(services, function (service, path) {
     // merge manifest
@@ -22,13 +22,12 @@ function createServer (services, config) {
 
   return Object.assign({ createStream }, methods)
 
-  function createStream() {
+  function createStream () {
     return createRpc().createStream()
   }
 
   function createRpc () {
-    var Rpc = muxrpc(null, manifest, serialize)
+    const Rpc = muxrpc(null, manifest, serialize)
     return Rpc(methods, permissions)
   }
 }
-

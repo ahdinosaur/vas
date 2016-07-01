@@ -1,8 +1,8 @@
-const muxrpc = require('muxrpc')
-const setIn = require('set-in')
+var muxrpc = require('muxrpc')
+var setIn = require('set-in')
 
-const defaultSerialize = require('./serialize')
-const walk = require('./walk')
+var defaultSerialize = require('./serialize')
+var walk = require('./walk')
 
 module.exports = createClient
 
@@ -14,8 +14,7 @@ function createClient (services, config) {
     setIn(manifest, path, service.manifest)
   })
 
-  const serialize = config.serialize || defaultSerialize
+  var serialize = config.serialize || defaultSerialize
 
   return muxrpc(manifest, null, serialize)()
 }
-
