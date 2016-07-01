@@ -14,7 +14,66 @@ for a user interface complement, see [`inu`](https://github.com/ahdinosaur/inu)
 
 ## example
 
-see [./example](./example)
+```js
+var vas = require('./')
+var pull = vas.pull
+var values = require('object-values')
+
+var service = {
+  name: 'things',
+  manifest: {
+    all: 'source',
+    get: 'async'
+  },
+  init: function (server, config) {
+    return { all, get }
+
+    function all () {
+      const things = values(config.data)
+      return pull.values(things)
+    }
+
+    function get (id, cb) {
+      cb(null, config.data[id])
+    }
+  }
+}
+
+// could also attach db connection, file descriptors, etc.
+var config = {
+  data: {
+    1: 'human',
+    2: 'computer',
+    3: 'JavaScript'
+  }
+}
+
+var port = 6000
+var url = `ws://localhost:${port}`
+var server = vas.listen(service, config, { port })
+var client = vas.connect(service, config, { url })
+
+client.things.get(1, (err, value) => {
+  if(err) throw err
+  console.log('get', value)
+  // get human
+})
+
+pull(
+  client.things.all(),
+  pull.drain(v => console.log('all', v))
+)
+// all human
+// all computer
+// all JavaScript
+
+setTimeout(function () {
+  server.close()
+  client.close()
+}, 1000)
+```
+
+for a more complete example, see [./example](./example).
 
 ## usage
 
@@ -27,7 +86,9 @@ a `vas` service is defined by an object with the following keys:
 - `manifest`: an object [muxrpc manifest](https://github.com/ssbc/muxrpc#manifest)
 - `permissions`: an object [muxrpc permissions](https://github.com/ssbc/muxrpc#permissions)
 - `init`: a `init(server, config)` pure function that returns an object of method functions to pass into [`muxrpc`](https://github.com/ssbc/muxrpc)
-- `services`: any recursive sub-services, represented as an `Array` of services
+- `services`: any recursive sub-services
+
+many `vas` services can refer to a single service or an `Array` of services
 
 ### `vas = require('vas')`
 
@@ -61,11 +122,21 @@ creates a server with `createServer(services, config)`, then
 
 listens to a port and begins to handle requests from clients using [`pull-ws-server`](https://github.com/pull-stream/pull-ws-server)
 
+`options` is an object with the following (optional) keys:
+
+- `port`: port to open WebSocket server
+- `onListen`: function to call once server is listening
+
 ### `vas.connect(client, config, options)`
 
 creates a client with `createClient(services, config)`, then
 
 connects the client to a server over websockets using [`pull-ws-server`](https://github.com/pull-stream/pull-ws-server)
+
+`options` is an object with the following (optional) keys:
+
+- `url`: string or [object](https://nodejs.org/api/url.html#url_url_strings_and_url_objects) to refer to WebSocket server
+- `onConnect`: function to call once client is connected
 
 ### TODO `vas.command(services, config, argv)`
 

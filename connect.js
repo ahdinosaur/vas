@@ -1,20 +1,22 @@
 var pull = require('pull-stream')
 var Ws = require('pull-ws-server/client')
 var Url = require('url')
+var defined = require('defined')
 
 var createClient = require('./createClient')
 
 module.exports = connect
 
-function connect (api, config, cb) {
-  var client = createClient(api, config)
+function connect (services, config, options) {
+  options = defined(options, {})
+
+  var url = defined(options.url, '')
+  var onConnect = options.onConnect
+
+  var client = createClient(services, config)
   var stream = Ws.connect(
-    getUrl(config),
-    function (err, stream) {
-      if (!cb) return
-      if (err) cb(err)
-      else cb(null, client)
-    }
+    getUrl(url),
+    onConnect
   )
 
   pull(
@@ -26,7 +28,7 @@ function connect (api, config, cb) {
   return client
 }
 
-function getUrl (config) {
-  return typeof config.url === 'string'
-    ? config.url : Url.format(config.url)
+function getUrl (url) {
+  return typeof url === 'string'
+    ? url : Url.format(url)
 }

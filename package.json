@@ -57,6 +57,7 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
+    "defined": "^1.0.0",
     "minimist": "^1.2.0",
     "muxrpc": "^6.3.3",
     "muxrpcli": "^1.0.5",
