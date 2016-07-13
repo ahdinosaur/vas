@@ -64,6 +64,6 @@
     "pull-serializer": "^0.3.2",
     "pull-stream": "^3.4.3",
     "pull-ws-server": "^1.9.3",
-    "set-in": "^1.1.1"
+    "set-in": "^2.0.0"
   }
 }
