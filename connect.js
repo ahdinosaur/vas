@@ -1,5 +1,5 @@
 var pull = require('pull-stream')
-var Ws = require('pull-ws-server/client')
+var Ws = require('pull-ws/client')
 var Url = require('url')
 var defined = require('defined')
 

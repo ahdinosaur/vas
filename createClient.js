@@ -16,5 +16,9 @@ function createClient (services, config) {
 
   var serialize = config.serialize || defaultSerialize
 
-  return muxrpc(manifest, null, serialize)()
+  var client = muxrpc(manifest, null, serialize)()
+
+  client.manifest = manifest
+
+  return client
 }
