@@ -8,10 +8,6 @@ const walk = require('./walk')
 module.exports = createServer
 
 function createServer (services, config) {
-  const manifest = {}
-  const permissions = {}
-  const methods = {}
-
   var server = {
     manifest: {},
     permissions: {},
