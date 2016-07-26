@@ -20,7 +20,10 @@ function createServer (services, config) {
     setIn(methods, path, service.init && service.init(service, config))
   })
 
-  return Object.assign({ createStream }, methods)
+  return Object.assign({
+    manifest,
+    createStream
+  }, methods)
 
   function createStream () {
     return createRpc().createStream()

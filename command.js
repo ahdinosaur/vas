@@ -1,4 +1,4 @@
-const minimist = require('minimist')
+const setIn = require('set-in')
 const muxrpcli = require('muxrpcli')
 
 const listen = require('./listen')
@@ -6,41 +6,37 @@ const connect = require('./connect')
 
 module.exports = command
 
-function command (service, config, argv) {
-  // get config as cli config after --, config before that are
-  // config to the command.
-  argv = argv.slice(2)
-  const i = argv.indexOf('--')
-  const configArgs = argv.slice(i + 1)
-  argv = ~i ? argv.slice(0) : argv
-
-  Object.assign(config, minimist(configArgs))
-  console.log('config', config)
-
-  if (argv[0] === 'server') {
+function command (services, config, options, argv) {
+  const args = argv.slice(2)
+  if (args[0] === 'server') {
     // special server command:
     // start the server
-    console.log('starting server')
-    listen(service, config)
+    options.onListen = onListen
+    const server = listen(services, config, options)
+
+    function onListen (err) {
+      if (err) throw err
+      console.log(`server listening at ws://localhost:${options.port}`)
+    }
   } else {
     // normal command:
     // create a client connection to the server
+    options.onConnect = onConnect
+    const client = connect(services, config, options)
 
-    // connect
-    connect(service, config, function (err, client) {
-      console.log('client', client)
+    function onConnect (err, ws) {
       if (err) {
-        if (/could not connect/.test(err.message)) {
-          console.log('Error: Could not connect to the server.')
-          console.log('Use the "server" command to start it.')
-          if (config.verbose) throw err
+        if (err.code === 'ECONNREFUSED') {
+          console.log(`Error: Could not connect to the server at ${err.target.url}.`)
+          console.log(`Use the "server" command to start it.`)
+          if (options.verbose) throw err
           process.exit(1)
         }
         throw err
       }
 
       // run commandline flow
-      muxrpcli(argv, client.manifest, client, config.verbose)
-    })
+      muxrpcli(args, client.manifest, client, options.verbose)
+    }
   }
 }
