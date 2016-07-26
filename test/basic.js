@@ -12,7 +12,7 @@ test('can create a client and server streams', function (t) {
     manifest: {
       find: 'source'
     },
-    init: function (server, config) {
+    methods: function (server, config) {
       return { find }
 
       function find () {

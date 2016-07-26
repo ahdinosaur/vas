@@ -15,7 +15,7 @@ test('can create client and server streams with multiple services', function (t)
       manifest: {
         find: 'source'
       },
-      init: function (server, config) {
+      methods: function (server, config) {
         return { find }
 
         function find () {
@@ -30,7 +30,7 @@ test('can create client and server streams with multiple services', function (t)
       manifest: {
         find: 'source'
       },
-      init: function (server, config) {
+      methods: function (server, config) {
         return { find }
 
         function find () {

@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "defined": "^1.0.0",
+    "get-in": "^2.0.0",
     "muxrpc": "^6.3.3",
     "muxrpcli": "^1.0.5",
     "pull-serializer": "^0.3.2",

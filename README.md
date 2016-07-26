@@ -25,7 +25,7 @@ var service = {
     all: 'source',
     get: 'async'
   },
-  init: function (server, config) {
+  methods: function (server, config) {
     return { all, get }
 
     function all () {
@@ -35,6 +35,15 @@ var service = {
 
     function get (id, cb) {
       cb(null, config.data[id])
+    }
+  },
+  permissions: function (server, config) {
+    return { get }
+
+    function get (id) {
+      if (id === 'nobody') {
+        return new Error('nobody is not an id')
+      }
     }
   }
 }
@@ -84,8 +93,8 @@ a `vas` service is defined by an object with the following keys:
 - `name`: a string name
 - `version` (optional): a string semantic version
 - `manifest`: an object [muxrpc manifest](https://github.com/ssbc/muxrpc#manifest)
-- `permissions`: an object [muxrpc permissions](https://github.com/ssbc/muxrpc#permissions)
-- `init`: a `init(server, config)` pure function that returns an object of method functions to pass into [`muxrpc`](https://github.com/ssbc/muxrpc)
+- `methods`: a `methods(server, config)` pure function that returns an object of method functions to pass into [`muxrpc`](https://github.com/ssbc/muxrpc)
+- `permissions`: a `permissions(server, config)` pure function that returns an object of permission functions which correspond to methods. each permission function accepts the same arguments as the method and can return an optional `new Error(...)` if the method should not be called.
 - `services`: any recursive sub-services
 
 many `vas` services can refer to a single service or an `Array` of services
@@ -100,7 +109,7 @@ you can also require each module separately like `require('vas/createServer')`.
 
 a `vas` server is an instantiation of a service that responds to requests.
 
-`createServer` returns an object that corresponds to the (recursive) services and respective methods returned by `init`.
+`createServer` returns an object that corresponds to the (recursive) services and respective methods returned by `methods`.
 
 ### `server.createStream()`
 
