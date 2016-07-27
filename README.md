@@ -155,6 +155,28 @@ run a command on a server as a command-line interface using [`muxrpcli`](https:/
 
 `argv` is expected to be `process.argv`.
 
+## frequently asked questions (FAQ)
+
+### how to reduce browser bundles
+
+by design, service definitions are re-used between client and server creations.
+
+this leads to all the server code being included in the browser, when really we only need the service names and manifests to create the client.
+
+to reduce our bundles to only this information (eliminating any `require` calls or other bloat in our service files), use the [`evalify`](https://github.com/ahdinosaur/evalify) browserify transform.
+
+to [`evalify`](https://github.com/ahdinosaur/evalify) only service files, where service files are always named  `service.js`, install `evalify` and add the following to your `package.json`
+
+```json
+{
+  "browserify": {
+    "transform": [
+      ["evalify", { "files": ["**/service.js"] } ]
+    ]
+  }
+}
+```
+
 ## inspiration
 
 - [`big`](https://jfhbrook.github.io/2013/05/28/the-case-for-a-nodejs-framework.html)
