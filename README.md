@@ -147,7 +147,7 @@ connects the client to a server over websockets using [`pull-ws-server`](https:/
 - `url`: string or [object](https://nodejs.org/api/url.html#url_url_strings_and_url_objects) to refer to WebSocket server
 - `onConnect`: function to call once client is connected
 
-### TODO `vas.command(services, config, options, argv)`
+### `vas.command(services, config, options, argv)`
 
 run a command on a server as a command-line interface using [`muxrpcli`](https://github.com/ssbc/muxrpcli)
 
