@@ -3,6 +3,7 @@
   "version": "1.2.0",
   "description": "simple composable data services using muxrpc",
   "main": "index.js",
+  "browser": "browser.js",
   "scripts": {
     "test:deps": "dependency-check . && dependency-check . --extra --no-dev",
     "test:lint": "standard",
