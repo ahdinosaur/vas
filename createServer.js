@@ -28,13 +28,12 @@ function createServer (services, config) {
 
   return server
 
-  function createStream () {
-    return createRpc().createStream()
+  function createStream (id) {
+    return createRpc(id).stream
   }
 
-  function createRpc () {
-    const Rpc = muxrpc(null, server.manifest, serialize)
-    return Rpc(server.methods, permission)
+  function createRpc (id) {
+    return muxrpc(server.manifest, server.manifest, server.methods, id, permission, serialize)
   }
 
   function permission (name, args) {
