@@ -147,13 +147,35 @@ connects the client to a server over websockets using [`pull-ws-server`](https:/
 - `url`: string or [object](https://nodejs.org/api/url.html#url_url_strings_and_url_objects) to refer to WebSocket server
 - `onConnect`: function to call once client is connected
 
-### TODO `vas.command(services, config, options, argv)`
+### `vas.command(services, config, options, argv)`
 
 run a command on a server as a command-line interface using [`muxrpcli`](https://github.com/ssbc/muxrpcli)
 
 `options` are either those passed to `vas.listen` or `vas.connect`, depending on if `argv[0] === 'server'`
 
 `argv` is expected to be `process.argv`.
+
+## frequently asked questions (FAQ)
+
+### how to reduce browser bundles
+
+by design, service definitions are re-used between client and server creations.
+
+this leads to all the server code being included in the browser, when really we only need the service names and manifests to create the client.
+
+to reduce our bundles to only this information (eliminating any `require` calls or other bloat in our service files), use the [`evalify`](https://github.com/ahdinosaur/evalify) browserify transform.
+
+to [`evalify`](https://github.com/ahdinosaur/evalify) only service files, where service files are always named  `service.js`, install `evalify` and add the following to your `package.json`
+
+```json
+{
+  "browserify": {
+    "transform": [
+      ["evalify", { "files": ["**/service.js"] } ]
+    ]
+  }
+}
+```
 
 ## inspiration
 

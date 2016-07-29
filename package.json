@@ -3,6 +3,7 @@
   "version": "1.2.0",
   "description": "simple composable data services using muxrpc",
   "main": "index.js",
+  "browser": "browser.js",
   "scripts": {
     "test:deps": "dependency-check . && dependency-check . --extra --no-dev",
     "test:lint": "standard",
@@ -59,11 +60,11 @@
   "dependencies": {
     "defined": "^1.0.0",
     "get-in": "^2.0.0",
-    "muxrpc": "^6.3.3",
+    "muxrpc": "github:ahdinosaur/muxrpc#reduce-bundle-size",
     "muxrpcli": "^1.0.5",
     "pull-serializer": "^0.3.2",
     "pull-stream": "^3.4.3",
-    "pull-ws": "^3.1.1",
+    "pull-ws": "github:pull-stream/pull-ws#export-browser",
     "set-in": "^2.0.0"
   }
 }
