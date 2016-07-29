@@ -15,7 +15,7 @@ function listen (api, config, options) {
   const onListen = options.onListen
 
   const server = createServer(api, config)
-  const ws = Ws.createServer(config, onConnect)
+  const ws = Ws.createServer(options, onConnect)
 
   return ws.listen(port, onListen)
 
