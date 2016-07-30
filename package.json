@@ -60,11 +60,11 @@
   "dependencies": {
     "defined": "^1.0.0",
     "get-in": "^2.0.0",
-    "muxrpc": "github:ahdinosaur/muxrpc#reduce-bundle-size",
+    "muxrpc": "^6.3.3",
     "muxrpcli": "^1.0.5",
     "pull-serializer": "^0.3.2",
     "pull-stream": "^3.4.3",
-    "pull-ws": "github:pull-stream/pull-ws#export-browser",
+    "pull-ws": "^3.2.2",
     "set-in": "^2.0.0"
   }
 }
