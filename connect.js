@@ -10,7 +10,7 @@ module.exports = connect
 function connect (services, config, options) {
   options = defined(options, {})
 
-  var url = defined(options.url, '')
+  var url = defined(options.url, '/')
   var onConnect = options.onConnect
 
   var client = createClient(services, config)
