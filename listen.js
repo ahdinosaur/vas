@@ -4,7 +4,7 @@ const defined = require('defined')
 
 const createServer = require('./createServer')
 
-const DEFAULT_PORT = 6000
+const DEFAULT_PORT = 5000
 
 module.exports = listen
 
