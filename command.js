@@ -22,7 +22,8 @@ function command (services, config, options, argv) {
 
   function onListen (err) {
     if (err) throw err
-    console.log(`server listening at ws://localhost:${options.port}`)
+    const url = options.url || `ws://localhost:${options.port}`
+    console.log(`server listening at ${url}`)
   }
 
   function onConnect (err, ws) {
