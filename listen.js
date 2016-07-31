@@ -1,6 +1,8 @@
 const pull = require('pull-stream')
 const Ws = require('pull-ws')
 const defined = require('defined')
+const http = require('http')
+const Stack = require('stack')
 
 const createServer = require('./createServer')
 
@@ -12,32 +14,27 @@ function listen (api, config, options) {
   options = defined(options, {})
 
   const port = defined(options.port, DEFAULT_PORT)
+  const createHttpServer = defined(options.createHttpServer, defaultCreateHttpServer)
   const onListen = options.onListen
-  const getId = defined(options.getId, defaultGetId)
 
   const server = createServer(api, config)
-  const ws = Ws.createServer(options, onConnect)
+
+  const context = { id: null }
+  const boundHandlers = server.handlers.map(handler => handler.bind(context))
+  const httpServer = createHttpServer(boundHandlers, config)
+
+  const ws = Ws.createServer(
+    Object.assign({ server: httpServer }, options),
+    onConnect
+  )
 
   return ws.listen(port, onListen)
 
   function onConnect (ws) {
-    getId(ws, function (err, id) {
-      if (err) {
-        return pull(
-          pull.error(err),
-          ws.sink
-        )
-      }
-
-      pull(
-        ws,
-        server.createStream(id),
-        ws
-      )
-    })
+    pull(ws, server.createStream(context.id), ws)
   }
 }
 
-function defaultGetId (ws, cb) {
-  cb(null, null)
+function defaultCreateHttpServer (handlers, config) {
+  return http.createServer(Stack.apply(null, handlers))
 }

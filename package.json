@@ -65,6 +65,7 @@
     "pull-serializer": "^0.3.2",
     "pull-stream": "^3.4.3",
     "pull-ws": "^3.2.2",
-    "set-in": "^2.0.0"
+    "set-in": "^2.0.0",
+    "stack": "^0.1.0"
   }
 }

@@ -12,6 +12,7 @@ function createServer (services, config) {
     manifest: {},
     permissions: {},
     methods: {},
+    handlers: [],
     createStream
   }
 
@@ -24,6 +25,8 @@ function createServer (services, config) {
     setIn(server.methods, path, service.methods && service.methods(server, config))
     // merge permissions
     setIn(server.permissions, path, service.permissions && service.permissions(server, config))
+    // merge http handlers
+    if (service.handlers) server.handlers = server.handlers.concat(service.handlers(server, config))
   })
 
   return server
