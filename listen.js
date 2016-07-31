@@ -1,5 +1,5 @@
 const pull = require('pull-stream')
-const Ws = require('pull-ws/server')
+const Ws = require('pull-ws')
 const defined = require('defined')
 
 const createServer = require('./createServer')
