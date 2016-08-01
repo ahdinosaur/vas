@@ -42,9 +42,17 @@ var service = {
 
     function get (id) {
       if (id === 'nobody') {
-        return new Error('nobody is not an id')
+        return new Error('nobody is not allowed.')
       }
     }
+  },
+  handlers: function (server, config) {
+    return [
+      function (req, res, next) {
+        console.log('cookie:', req.headers.cookie)
+        next()
+      }
+    ]
   }
 }
 
@@ -95,7 +103,10 @@ a `vas` service is defined by an object with the following keys:
 - `manifest`: an object [muxrpc manifest](https://github.com/ssbc/muxrpc#manifest)
 - `methods`: a `methods(server, config)` pure function that returns an object of method functions to pass into [`muxrpc`](https://github.com/ssbc/muxrpc)
 - `permissions`: a `permissions(server, config)` pure function that returns an object of permission functions which correspond to methods. each permission function accepts the same arguments as the method and can return an optional `new Error(...)` if the method should not be called.
+- `handlers` a `handlers(server, config)` pure function that returns an array of http request handler functions, each of shape `(req, res, next) => { next() }`.
 - `services`: any recursive sub-services
+
+in either a method, permission, or handler function: `this.id` corresponds to a shared value to set and get for each connection. (_hint_: auth)
 
 many `vas` services can refer to a single service or an `Array` of services
 
@@ -111,19 +122,18 @@ a `vas` server is an instantiation of a service that responds to requests.
 
 `createServer` returns an object that corresponds to the (recursive) services and respective methods returned by `methods`.
 
-### `server.createStream()`
-
-returns a [duplex pull stream](https://github.com/dominictarr/pull-stream-examples/blob/master/duplex.js) using [`muxrpc`](https://github.com/ssbc/muxrpc)
-
 ### `client = vas.createClient(services, config)`
 
 a `vas` client is a composition of manifests to makes requests.
 
-`createClient` returns an object that corresponds to the (rescursive) services and respective methods in `manifest`.
+`createClient` returns an object that corresponds to the (recursive) services and respective methods in `manifest`.
 
-### `client.createStream()`
+### `server.createStream(id)`
+### `client.createStream(id)`
 
 returns a [duplex pull stream](https://github.com/dominictarr/pull-stream-examples/blob/master/duplex.js) using [`muxrpc`](https://github.com/ssbc/muxrpc)
+
+if `id` is passed in, will bind each method function with `id` as `this.id`.
 
 ### `vas.listen(services, config, options)`
 
@@ -176,6 +186,10 @@ to [`evalify`](https://github.com/ahdinosaur/evalify) only service files, where 
   }
 }
 ```
+
+### TODO how to do authentication
+
+### TODO how to do authorization
 
 ## inspiration
 
