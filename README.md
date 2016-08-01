@@ -12,6 +12,10 @@ for a user interface complement, see [`inu`](https://github.com/ahdinosaur/inu)
 
 ![human vasculatory system](https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Circulatory_System_no_tags.svg/259px-Circulatory_System_no_tags.svg.png)
 
+## demos
+
+- [holodex/app#compost](https://github.com/holodex/app/tree/compost): full-stack user directory app using [`inu`](https://github.com/ahdinosaur/inu), [`inux`](https://github.com/ahdinosaur/inux), and [`vas`](https://github.com/ahdinosaur/vas)
+
 ## example
 
 ```js
