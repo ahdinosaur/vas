@@ -42,9 +42,17 @@ var service = {
 
     function get (id) {
       if (id === 'nobody') {
-        return new Error('nobody is not an id')
+        return new Error('nobody is not allowed.')
       }
     }
+  },
+  handlers: function (server, config) {
+    return [
+      function (req, res, next) {
+        console.log('cookie:', req.headers.cookie)
+        next()
+      }
+    ]
   }
 }
 
@@ -95,7 +103,10 @@ a `vas` service is defined by an object with the following keys:
 - `manifest`: an object [muxrpc manifest](https://github.com/ssbc/muxrpc#manifest)
 - `methods`: a `methods(server, config)` pure function that returns an object of method functions to pass into [`muxrpc`](https://github.com/ssbc/muxrpc)
 - `permissions`: a `permissions(server, config)` pure function that returns an object of permission functions which correspond to methods. each permission function accepts the same arguments as the method and can return an optional `new Error(...)` if the method should not be called.
+- `handlers` a `handlers(server, config)` pure function that returns an array of http request handler functions, each of shape `(req, res, next) => { next() }`.
 - `services`: any recursive sub-services
+
+in either a method, permission, or handler function: `this.id` corresponds to a shared value to set and get for each connection. (_hint_: auth)
 
 many `vas` services can refer to a single service or an `Array` of services
 
