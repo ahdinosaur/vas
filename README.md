@@ -108,9 +108,8 @@ a `vas` service is defined by an object with the following keys:
 - `methods`: a `methods(server, config)` pure function that returns an object of method functions to pass into [`muxrpc`](https://github.com/ssbc/muxrpc)
 - `permissions`: a `permissions(server, config)` pure function that returns an object of permission functions which correspond to methods. each permission function accepts the same arguments as the method and can return an optional `new Error(...)` if the method should not be called.
 - `handlers` a `handlers(server, config)` pure function that returns an array of http request handler functions, each of shape `(req, res, next) => { next() }`.
+- `authenticate`: a `authenticate(server, config)` pure function that returns an authentication function, of shape `(req, cb) => cb(err, id)`. only the first `authenticate` function will be used for a given set of services. the `id` returned by `authenticate` will be available as `this.id` in method or permission functions and `req.id` in handler functions.
 - `services`: any recursive sub-services
-
-in either a method, permission, or handler function: `this.id` corresponds to a shared value to set and get for each connection. (_hint_: auth)
 
 many `vas` services can refer to a single service or an `Array` of services
 
@@ -137,7 +136,7 @@ a `vas` client is a composition of manifests to makes requests.
 
 returns a [duplex pull stream](https://github.com/dominictarr/pull-stream-examples/blob/master/duplex.js) using [`muxrpc`](https://github.com/ssbc/muxrpc)
 
-if `id` is passed in, will bind each method function with `id` as `this.id`.
+for a server, if `id` is passed in, will bind each method or permission function with `id` as `this.id`.
 
 ### `vas.listen(services, config, options)`
 

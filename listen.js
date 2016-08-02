@@ -19,20 +19,28 @@ function listen (api, config, options) {
 
   const server = createServer(api, config)
 
-  const context = { id: null }
-  const boundHandlers = server.handlers.map(handler => handler.bind(context))
-  const httpServer = createHttpServer(boundHandlers, config)
+  const handlers = [
+    (req, res, next) => {
+      server.authenticate(req, (err, id) => {
+        if (err) console.error(err) // should we handle this error?
+        req.id = id; next()
+      })
+    }
+  ].concat(server.handlers)
+
+  const httpServer = createHttpServer(handlers, config)
 
   const ws = Ws.createServer(
     Object.assign({ server: httpServer }, options),
-    onConnect
+    function onConnect (ws) {
+      server.authenticate(ws, (err, id) => {
+        if (err) console.error(err) // should we handle this error?
+        pull(ws, server.createStream(id), ws)
+      })
+    }
   )
 
   return ws.listen(port, onListen)
-
-  function onConnect (ws) {
-    pull(ws, server.createStream(context.id), ws)
-  }
 }
 
 function defaultCreateHttpServer (handlers, config) {

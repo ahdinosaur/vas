@@ -27,7 +27,10 @@ function createServer (services, config) {
     setIn(server.permissions, path, service.permissions && service.permissions(server, config))
     // merge http handlers
     if (service.handlers) server.handlers = server.handlers.concat(service.handlers(server, config))
+    if (!server.authenticate && service.authenticate) server.authenticate = service.authenticate(server, config)
   })
+
+  if (!server.authenticate) server.authenticate = defaultAuthenticate
 
   return server
 
@@ -43,4 +46,8 @@ function createServer (services, config) {
     const perm = getIn(server.permissions, name)
     return perm != null ? perm(...args) : null
   }
+}
+
+function defaultAuthenticate (req, cb) {
+  cb(null, null)
 }
