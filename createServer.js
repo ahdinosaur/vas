@@ -19,8 +19,6 @@ function createServer (services, config) {
   walk(services, function (service, path) {
     // merge manifest
     setIn(server.manifest, path, service.manifest)
-    // BACK COMPAT
-    if (!service.methods && service.init) service.methods = service.init
     // merge methods by calling service.init(service, config)
     setIn(server.methods, path, service.methods && service.methods(server, config))
     // merge permissions
