@@ -14,7 +14,7 @@ for a user interface complement, see [`inu`](https://github.com/ahdinosaur/inu)
 
 ## demos
 
-- [holodex/app#compost](https://github.com/holodex/app/tree/compost): full-stack user directory app using [`inu`](https://github.com/ahdinosaur/inu), [`inux`](https://github.com/ahdinosaur/inux), and [`vas`](https://github.com/ahdinosaur/vas)
+- [holodex/app](https://github.com/holodex/app): full-stack user directory app using [`inu`](https://github.com/ahdinosaur/inu), [`inux`](https://github.com/ahdinosaur/inux), and [`vas`](https://github.com/ahdinosaur/vas)
 
 ## example
 
@@ -119,25 +119,6 @@ the top-level `vas` module is a grab bag of all `vas/*` modules.
 
 you can also require each module separately like `require('vas/createServer')`.
 
-### `server = vas.createServer(services, config)`
-
-a `vas` server is an instantiation of a service that responds to requests.
-
-`createServer` returns an object that corresponds to the (recursive) services and respective methods returned by `methods`.
-
-### `client = vas.createClient(services, config)`
-
-a `vas` client is a composition of manifests to makes requests.
-
-`createClient` returns an object that corresponds to the (recursive) services and respective methods in `manifest`.
-
-### `server.createStream(id)`
-### `client.createStream(id)`
-
-returns a [duplex pull stream](https://github.com/dominictarr/pull-stream-examples/blob/master/duplex.js) using [`muxrpc`](https://github.com/ssbc/muxrpc)
-
-for a server, if `id` is passed in, will bind each method or permission function with `id` as `this.id`.
-
 ### `vas.listen(services, config, options)`
 
 creates a server with `createServer(services, config)`, then
@@ -148,6 +129,7 @@ listens to a port and begins to handle requests from clients using [`pull-ws-ser
 
 - `port`: port to open WebSocket server
 - `onListen`: function to call once server is listening
+- `createHttpServer`: function to create http server, of shape `(handlers) => server`. default is `(handlers) => http.createServer(Stack(...handlers))`
 
 ### `vas.connect(client, config, options)`
 
@@ -167,6 +149,27 @@ run a command on a server as a command-line interface using [`muxrpcli`](https:/
 `options` are either those passed to `vas.listen` or `vas.connect`, depending on if `argv[0] === 'server'`
 
 `argv` is expected to be `process.argv`.
+
+---
+
+### `server = vas.createServer(services, config)`
+
+a `vas` server is an instantiation of a service that responds to requests.
+
+`createServer` returns an object that corresponds to the (recursive) services and respective methods returned by `methods`.
+
+### `client = vas.createClient(services, config)`
+
+a `vas` client is a composition of manifests to makes requests.
+
+`createClient` returns an object that corresponds to the (recursive) services and respective methods in `manifest`.
+
+### `server.createStream(id)`
+### `client.createStream(id)`
+
+returns a [duplex pull stream](https://github.com/dominictarr/pull-stream-examples/blob/master/duplex.js) using [`muxrpc`](https://github.com/ssbc/muxrpc)
+
+for a server, if `id` is passed in, will bind each method or permission function with `id` as `this.id`.
 
 ## frequently asked questions (FAQ)
 
