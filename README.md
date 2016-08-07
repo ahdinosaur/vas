@@ -54,12 +54,12 @@
 ## features
 
 - **API is a data structure**: easy to understand and simple to extend
-- **simple**: methods, permissions, handlers are just functions, no magic
-- **architecture is fractal**: compose one API from many smaller APIs
+- **functional**: methods, permissions, handlers are just functions, no magic
+- **fractal**: compose one API from many smaller APIs
 - **database-agnostic**: create API services on top of anything
-- **authentication**: supports keeping track of the current user
-- **authorization**: supports checking users are permitted to call APIs
-- **http stack**: services can include http request handlers like front-end bundlers, blob stores, etc
+- **authentication**: identify who the current user is
+- **authorization**: permit what a user can do
+- **http stack**: same paradigm for http request handlers like front-end bundlers, blob stores, etc
 - [**omakse**](https://youtu.be/E99FnoYqoII): consistent flavoring with [pull streams](https://pull-streams.github.io) all the way down
 
 for a user interface complement, see [`inu`](https://github.com/ahdinosaur/inu)
