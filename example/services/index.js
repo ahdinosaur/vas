@@ -1,3 +1,4 @@
 module.exports = [
-  require('./things')
+  require('./things'),
+  require('./static')
 ]

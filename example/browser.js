@@ -1,10 +1,11 @@
-var vas = require('../')
-var pull = vas.pull
+const vas = require('../')
+const pull = vas.pull
 
-var services = require('./services')
-var config = require('./config')
+const services = require('./services')
+const config = require('./config')
 
-var client = vas.connect(services, config)
+const url = config.url
+const client = vas.connect(services, config, { url })
 
 console.log('client', client)
 

@@ -1,17 +1,24 @@
-var pull = require('../../').pull
+const pull = require('../../').pull
 
 module.exports = {
   name: 'things',
-  version: '0.0.0',
-  permissions: function (path, args) {},
+  version: '1.0.0',
   manifest: {
     find: 'source'
   },
-  init: function (server, config) {
+  methods: function (server, config) {
     return { find: find }
 
     function find () {
-      return pull.values(config.data)
+      const things = values(config.data.things)
+      return pull.values(things)
     }
   }
+}
+
+function values (obj) {
+  return Object.keys(obj)
+    .reduce((sofar, key) => {
+      return sofar.concat([obj[key]])
+    }, [])
 }

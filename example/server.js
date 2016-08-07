@@ -1,6 +1,9 @@
-var vas = require('../')
+const vas = require('../')
 
-var services = require('./services')
-var config = require('./config')
+const services = require('./services')
+const config = require('./config')
 
-vas.listen(services, config)
+const port = config.port
+vas.listen(services, config, { port })
+
+console.log(`server listening on port ${port}.`)

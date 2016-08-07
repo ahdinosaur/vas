@@ -1,7 +1,12 @@
-var vas = require('../')
-// var pull = vas.pull
+#!/usr/bin/env node
 
-var services = require('./services')
-var config = require('./config')
+const vas = require('../')
 
-vas.command(services, config, process.argv)
+const services = require('./services')
+const config = require('./config')
+
+const options = {
+  port: config.port,
+  url: config.url
+}
+vas.command(services, config, options, process.argv)

@@ -1,3 +1,4 @@
+const Url = require('url')
 const muxrpcli = require('muxrpcli')
 
 const listen = require('./listen')
@@ -22,7 +23,11 @@ function command (services, config, options, argv) {
 
   function onListen (err) {
     if (err) throw err
-    const url = options.url || `ws://localhost:${options.port}`
+    const url = (typeof options.url === 'string'
+      ? options.url
+      : Url.format(options.url)
+    ) || `ws://localhost:${options.port}`
+
     console.log(`server listening at ${url}`)
   }
 
