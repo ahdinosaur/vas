@@ -73,7 +73,7 @@ for a user interface complement, see [`inu`](https://github.com/ahdinosaur/inu)
 ## example
 
 ```js
-var vas = require('./')
+var vas = require('vas')
 var pull = vas.pull
 var values = require('object-values')
 
