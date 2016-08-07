@@ -175,7 +175,7 @@ const methods = {
   add
 }
 
-function getAll (cb) {
+function getAll () {
   return toPull(db('todos').select().stream())
 }
 
