@@ -1,6 +1,6 @@
 {
   "name": "vas",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "simple composable data services using muxrpc",
   "main": "index.js",
   "browser": "browser.js",
