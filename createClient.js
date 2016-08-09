@@ -7,9 +7,12 @@ var walk = require('./walk')
 
 module.exports = createClient
 
-function createClient (services, config) {
+function createClient (services, config, options) {
   services = defined(services, [])
   config = defined(config, {})
+  options = defined(options, {})
+
+  var serialize = defined(options.serialize, defaultSerialize)
 
   var manifest = {}
 
@@ -17,8 +20,6 @@ function createClient (services, config) {
     // merge manifest
     setIn(manifest, path, service.manifest)
   })
-
-  var serialize = config.serialize || defaultSerialize
 
   var client = muxrpc(manifest, null, serialize)()
 

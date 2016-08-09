@@ -17,7 +17,7 @@ function listen (api, config, options) {
   const createHttpServer = defined(options.createHttpServer, defaultCreateHttpServer)
   const onListen = options.onListen
 
-  const server = createServer(api, config)
+  const server = createServer(api, config, options)
 
   const handlers = [
     (req, res, next) => {

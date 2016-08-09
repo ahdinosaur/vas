@@ -13,7 +13,7 @@ function connect (services, config, options) {
   var url = defined(options.url, '/')
   var onConnect = options.onConnect
 
-  var client = createClient(services, config)
+  var client = createClient(services, config, options)
   var stream = Ws.connect(
     getUrl(url),
     onConnect

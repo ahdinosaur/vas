@@ -3,14 +3,17 @@ const setIn = require('set-in')
 const getIn = require('get-in')
 const defined = require('defined')
 
-const serialize = require('./serialize')
+const defaultSerialize = require('./serialize')
 const walk = require('./walk')
 
 module.exports = createServer
 
-function createServer (services, config) {
+function createServer (services, config, options) {
   services = defined(services, [])
   config = defined(config, {})
+  options = defined(options, {})
+
+  const serialize = defined(options.serialize, defaultSerialize)
 
   var server = {
     manifest: {},

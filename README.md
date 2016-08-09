@@ -265,6 +265,7 @@ listens to a port and begins to handle requests from clients using [`pull-ws-ser
 - `port`: port to open WebSocket server
 - `onListen`: function to call once server is listening
 - `createHttpServer`: function to create http server, of shape `(handlers) => server`. default is `(handlers) => http.createServer(Stack(...handlers))`
+- `serialize`: a duplex pull stream to stringify and parse json objects being sent to and from methods
 
 ### `vas.connect(client, config, options)`
 
@@ -276,6 +277,7 @@ connects the client to a server over websockets using [`pull-ws-server`](https:/
 
 - `url`: string or [object](https://nodejs.org/api/url.html#url_url_strings_and_url_objects) to refer to WebSocket server
 - `onConnect`: function to call once client is connected
+- `serialize`: a duplex pull stream to stringify and parse json objects being sent to and from methods
 
 ### `vas.command(services, config, options, argv)`
 
@@ -287,17 +289,25 @@ run a command on a server as a command-line interface using [`muxrpcli`](https:/
 
 ---
 
-### `server = vas.createServer(services, config)`
+### `server = vas.createServer(services, config, options)`
 
 a `vas` server is an instantiation of a service that responds to requests.
 
 `createServer` returns an object that corresponds to the (recursive) services and respective methods returned by `methods`.
 
-### `client = vas.createClient(services, config)`
+`options` is an object with the following (optional) keys:
+
+- `serialize`: a duplex pull stream to stringify and parse json objects being sent to and from methods
+
+### `client = vas.createClient(services, config, options)`
 
 a `vas` client is a composition of manifests to makes requests.
 
 `createClient` returns an object that corresponds to the (recursive) services and respective methods in `manifest`.
+
+`options` is an object with the following (optional) keys:
+
+- `serialize`: a duplex pull stream to stringify and parse json objects being sent to and from methods
 
 ### `server.createStream(id)`
 ### `client.createStream(id)`
