@@ -1,5 +1,6 @@
 const Url = require('url')
 const muxrpcli = require('muxrpcli')
+const defined = require('defined')
 
 const listen = require('./listen')
 const connect = require('./connect')
@@ -7,6 +8,9 @@ const connect = require('./connect')
 module.exports = command
 
 function command (services, config, options, argv) {
+  options = defined(options, {})
+  argv = defined(argv, process.argv)
+
   const args = argv.slice(2)
   if (args[0] === 'server') {
     // special server command:

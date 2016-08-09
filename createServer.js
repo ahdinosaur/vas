@@ -1,6 +1,7 @@
 const muxrpc = require('muxrpc')
 const setIn = require('set-in')
 const getIn = require('get-in')
+const defined = require('defined')
 
 const serialize = require('./serialize')
 const walk = require('./walk')
@@ -8,6 +9,9 @@ const walk = require('./walk')
 module.exports = createServer
 
 function createServer (services, config) {
+  services = defined(services, [])
+  config = defined(config, {})
+
   var server = {
     manifest: {},
     permissions: {},
