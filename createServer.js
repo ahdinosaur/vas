@@ -42,7 +42,7 @@ function createServer (services, config) {
 
   function permission (name, args) {
     const perm = getIn(server.permissions, name)
-    return perm != null ? perm(...args) : null
+    return perm != null ? perm.apply(this, args) : null
   }
 }
 
