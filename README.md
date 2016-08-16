@@ -263,7 +263,7 @@ listens to a port and begins to handle requests from clients using [`pull-ws-ser
 `options` is an object with the following (optional) keys:
 
 - `port`: port to open WebSocket server
-- `onListen`: function to call once server is listening
+- `onListen`: function to call once server is listening, receives `(err, httpServer, wsServer)`.
 - `createHttpServer`: function to create http server, of shape `(handlers) => server`. default is `(handlers) => http.createServer(Stack(...handlers))`
 - `serialize`: a duplex pull stream to stringify and parse json objects being sent to and from methods
 

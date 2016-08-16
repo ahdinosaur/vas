@@ -40,7 +40,9 @@ function listen (api, config, options) {
     }
   )
 
-  return ws.listen(port, onListen)
+  return ws.listen(port, function (err) {
+    onListen(err, httpServer, ws)
+  })
 }
 
 function defaultCreateHttpServer (handlers, config) {
