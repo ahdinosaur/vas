@@ -11,9 +11,10 @@ console.log('client', client)
 
 pull(
   client.things.find(),
-  pull.drain(function (thing) {
+  pull.through(function (thing) {
     console.log('source found thing', thing)
-  })
+  }),
+  client.things.log()
 )
 
 client.things.getAsync({ id: 1 }, function (err, thing) {

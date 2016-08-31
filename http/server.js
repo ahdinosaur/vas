@@ -25,19 +25,23 @@ function createHttpServerHandler (server, options) {
 
     switch (type) {
       case 'source':
+        res.setHeader('Content-Type', 'application/json; boundary=NLNL')
         return pull(
           call(options),
           pull.map(value => ({ value })),
           serialize.stringify(),
           toPull.sink(res, function (err) {
-            res.end(stringifyError(err))
+            if (err) {
+              res.end(stringifyError(err))
+            }
           })
         )
       case 'sink':
         return pull(
           toPull.source(req),
+          pull.through(console.log),
           serialize.parse(),
-          call(options)
+          call(options, cb)
         )
       case 'async':
         return call(options, cb)
@@ -67,7 +71,7 @@ function createHttpServerHandler (server, options) {
 }
 
 function stringify (json) {
-  return JSON.stringify(json, null, 2)
+  return JSON.stringify(json, null, 2) + '\n\n'
 }
 
 function stringifyValue (value) {

@@ -2,9 +2,7 @@ var defined = require('defined')
 var Url = require('url')
 var getIn = require('get-in')
 var Path = require('path')
-var toPull = require('stream-to-pull-stream')
-var defer = require('pull-defer')
-var get = require('simple-get')
+var pullHttp = require('pull-http-client')
 var pull = require('pull-stream')
 
 var defaultSerialize = require('../serialize')
@@ -30,34 +28,42 @@ function createHttpClient (client, options) {
         ),
         query: options
       })
+      var httpOpts = {
+        url: url,
+        json: true,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      }
 
       switch (type) {
         case 'async':
         case 'sync':
-          return get.concat({
-            url: url,
-            json: true
-          }, function (err, res, data) {
+          return pullHttp.async(httpOpts, function (err, data) {
             if (err) return cb(err)
-
             handleData(data, cb)
           })
         case 'source':
-          var deferred = defer.source()
-          get(url, function (err, res) {
-            if (err) return deferred.abort(err)
-
-            var source = pull(
-              toPull.source(res),
-              serialize.parse(),
-              pull.asyncMap(handleData)
-            )
-            deferred.resolve(source)
-          })
-          return deferred
+          return pull(
+            pullHttp.source(httpOpts),
+            serialize.parse(),
+            pull.asyncMap(handleData)
+          )
+        case 'sink':
+          httpOpts.headers['Content-Type'] = 'application/json; boundary=NLNL',
+          httpOpts.headers['Transfer-Encoding'] = 'chunked'
+          return pull(
+            serialize.stringify(),
+            pullHttp.sink(httpOpts, cb || ifErrorThrow)
+          )
       }
     }
   })
+}
+
+function ifErrorThrow (err) {
+  if (err) throw err
 }
 
 function handleData (data, cb) {

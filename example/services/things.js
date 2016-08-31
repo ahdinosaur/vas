@@ -6,7 +6,8 @@ module.exports = {
   manifest: {
     getSync: 'sync',
     getAsync: 'async',
-    find: 'source'
+    find: 'source',
+    log: 'sink'
   },
   methods: function (server, config) {
     const things = config.data.things
@@ -14,7 +15,8 @@ module.exports = {
     return {
       getSync: getSync,
       getAsync: getAsync,
-      find: find
+      find: find,
+      log: log
     }
 
     function getSync (options) {
@@ -27,6 +29,10 @@ module.exports = {
 
     function find () {
       return pull.values(values(things))
+    }
+
+    function log () {
+      return pull.log()
     }
   }
 }
