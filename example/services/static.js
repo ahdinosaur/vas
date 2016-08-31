@@ -21,7 +21,7 @@ module.exports = {
           const index = join(config.root, 'index.html')
           fs.createReadStream(index)
             .pipe(res)
-        }
+        } else next()
       }
     ]
   }

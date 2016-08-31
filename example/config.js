@@ -8,7 +8,7 @@ module.exports = {
         description: 'clean and tidy, wait just kidding.'
       },
       2: {
-        id: 1,
+        id: 2,
         name: 'vas',
         description: 'want continuous improvement, but need help.'
       }
@@ -16,7 +16,7 @@ module.exports = {
   },
   port: 5000,
   url: {
-    protocol: 'ws',
+    protocol: 'http',
     hostname: 'localhost',
     port: 5000
   }

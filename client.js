@@ -1,4 +1,3 @@
-var muxrpc = require('muxrpc')
 var setIn = require('set-in')
 var defined = require('defined')
 
@@ -14,16 +13,14 @@ function createClient (services, config, options) {
 
   var serialize = defined(options.serialize, defaultSerialize)
 
-  var manifest = {}
+  var client = {
+    manifest: {}
+  }
 
   walk(services, function (service, path) {
     // merge manifest
-    setIn(manifest, path, service.manifest)
+    setIn(client.manifest, path, service.manifest)
   })
-
-  var client = muxrpc(manifest, null, serialize)()
-
-  client.manifest = manifest
 
   return client
 }

@@ -1,5 +1,5 @@
 module.exports = {
-  createClient: require('./createClient'),
+  Client: require('./client'),
   connect: require('./connect'),
   pull: require('pull-stream')
 }

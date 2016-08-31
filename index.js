@@ -1,6 +1,6 @@
 module.exports = {
-  createServer: require('./createServer'),
-  createClient: require('./createClient'),
+  Server: require('./server'),
+  Client: require('./client'),
   listen: require('./listen'),
   connect: require('./connect'),
   command: require('./command'),

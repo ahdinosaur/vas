@@ -1,7 +1,3 @@
-var Serializer = require('pull-serializer')
+var pullJson = require('pull-json-doubleline')
 
-module.exports = serialize
-
-function serialize (stream) {
-  return Serializer(stream, JSON, { split: '\n\n' })
-}
+module.exports = pullJson

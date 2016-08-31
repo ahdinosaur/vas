@@ -12,6 +12,14 @@ console.log('client', client)
 pull(
   client.things.find(),
   pull.drain(function (thing) {
-    console.log('thing', thing)
+    console.log('source found thing', thing)
   })
 )
+
+client.things.getAsync({ id: 1 }, function (err, thing) {
+  console.log('async got thing', thing)
+})
+
+client.things.getSync({ id: 2 }, function (err, thing) {
+  console.log('sync got thing', thing)
+})

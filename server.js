@@ -1,4 +1,3 @@
-const muxrpc = require('muxrpc')
 const setIn = require('set-in')
 const getIn = require('get-in')
 const defined = require('defined')
@@ -13,14 +12,11 @@ function createServer (services, config, options) {
   config = defined(config, {})
   options = defined(options, {})
 
-  const serialize = defined(options.serialize, defaultSerialize)
-
   var server = {
     manifest: {},
     permissions: {},
     methods: {},
-    handlers: [],
-    createStream
+    handlers: []
   }
 
   walk(services, function (service, path) {
@@ -38,19 +34,6 @@ function createServer (services, config, options) {
   if (!server.authenticate) server.authenticate = defaultAuthenticate
 
   return server
-
-  function createStream (id) {
-    return createRpc(id).stream
-  }
-
-  function createRpc (id) {
-    return muxrpc(server.manifest, server.manifest, server.methods, id, permission, serialize)
-  }
-
-  function permission (name, args) {
-    const perm = getIn(server.permissions, name)
-    return perm != null ? perm.apply(this, args) : null
-  }
 }
 
 function defaultAuthenticate (req, cb) {

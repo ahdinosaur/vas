@@ -30,7 +30,7 @@ function command (services, config, options, argv) {
     const url = (typeof options.url === 'string'
       ? options.url
       : Url.format(options.url)
-    ) || `ws://localhost:${options.port}`
+    ) || `http://localhost:${options.port}`
 
     console.log(`server listening at ${url}`)
   }

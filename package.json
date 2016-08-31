@@ -59,12 +59,13 @@
   "dependencies": {
     "defined": "^1.0.0",
     "get-in": "^2.0.0",
-    "muxrpc": "^6.3.3",
     "muxrpcli": "^1.0.5",
+    "pull-defer": "^0.2.2",
+    "pull-json-doubleline": "github:ahdinosaur/pull-json-doubleline#v2",
     "pull-serializer": "^0.3.2",
     "pull-stream": "^3.4.3",
-    "pull-ws": "^3.2.3",
     "set-in": "^2.0.0",
+    "simple-get": "^2.2.2",
     "stack": "^0.1.0"
   }
 }

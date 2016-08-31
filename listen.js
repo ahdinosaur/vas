@@ -1,10 +1,10 @@
 const pull = require('pull-stream')
-const Ws = require('pull-ws')
 const defined = require('defined')
 const http = require('http')
 const Stack = require('stack')
 
-const createServer = require('./createServer')
+const Handler = require('./http/server')
+const Server = require('./server')
 
 const DEFAULT_PORT = 5000
 
@@ -17,7 +17,7 @@ function listen (api, config, options) {
   const createHttpServer = defined(options.createHttpServer, defaultCreateHttpServer)
   const onListen = options.onListen
 
-  const server = createServer(api, config, options)
+  const server = Server(api, config, options)
 
   const handlers = [
     (req, res, next) => {
@@ -26,23 +26,13 @@ function listen (api, config, options) {
         req.id = id; next()
       })
     }
-  ].concat(server.handlers)
+  ].concat(server.handlers).concat([
+    Handler(server, options)
+  ])
 
   const httpServer = createHttpServer(handlers, config)
 
-  const ws = Ws.createServer(
-    Object.assign({ server: httpServer }, options),
-    function onConnect (ws) {
-      server.authenticate(ws, (err, id) => {
-        if (err) console.error(err) // should we handle this error?
-        pull(ws, server.createStream(id), ws)
-      })
-    }
-  )
-
-  return ws.listen(port, function (err) {
-    onListen(err, httpServer, ws)
-  })
+  return httpServer.listen(port, onListen)
 }
 
 function defaultCreateHttpServer (handlers, config) {

@@ -4,14 +4,29 @@ module.exports = {
   name: 'things',
   version: '1.0.0',
   manifest: {
+    getSync: 'sync',
+    getAsync: 'async',
     find: 'source'
   },
   methods: function (server, config) {
-    return { find: find }
+    const things = config.data.things
+
+    return {
+      getSync: getSync,
+      getAsync: getAsync,
+      find: find
+    }
+
+    function getSync (options) {
+      return things[options.id]
+    }
+
+    function getAsync (options, cb) {
+      cb(null, things[options.id])
+    }
 
     function find () {
-      const things = values(config.data.things)
-      return pull.values(things)
+      return pull.values(values(things))
     }
   }
 }
