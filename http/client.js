@@ -38,7 +38,9 @@ function createHttpClient (client, options) {
             url: url,
             json: true
           }, function (err, res, data) {
-            cb(err, data)
+            if (err) return cb(err)
+
+            handleData(data, cb)
           })
         case 'source':
           var deferred = defer.source()
@@ -47,7 +49,8 @@ function createHttpClient (client, options) {
 
             var source = pull(
               toPull.source(res),
-              serialize.parse()
+              serialize.parse(),
+              pull.asyncMap(handleData)
             )
             deferred.resolve(source)
           })
@@ -55,6 +58,14 @@ function createHttpClient (client, options) {
       }
     }
   })
+}
+
+function handleData (data, cb) {
+  if (data.error) {
+    cb(data.error)
+  } else if (data.value) {
+    cb(null, data.value)
+  }
 }
 
 function map(manifest, name, fn) {

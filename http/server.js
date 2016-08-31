@@ -3,6 +3,7 @@ const defined = require('defined')
 const getIn = require('get-in')
 const toPull = require('stream-to-pull-stream')
 const pull = require('pull-stream')
+const serializeError = require('serialize-error')
 
 const defaultSerialize = require('../serialize')
 
@@ -26,8 +27,11 @@ function createHttpServerHandler (server, options) {
       case 'source':
         return pull(
           call(options),
+          pull.map(value => ({ value })),
           serialize.stringify(),
-          toPull.sink(res)
+          toPull.sink(res, function (err) {
+            res.end(stringifyError(err))
+          })
         )
       case 'sink':
         return pull(
@@ -48,14 +52,39 @@ function createHttpServerHandler (server, options) {
     }
 
     function cb (err, value) {
-      if (err) return next(err)
-
       res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify(value, null, 2))
+
+      if (err) {
+        res.statusCode = 500
+        res.end(stringifyError(err))
+      } else {
+        res.end(stringifyValue(value))
+      }
     }
   }
 
   return handler
+}
+
+function stringify (json) {
+  return JSON.stringify(json, null, 2)
+}
+
+function stringifyValue (value) {
+  return stringify({ value })
+}
+
+function stringifyError (err) {
+  const error = serializeError(err)
+  return stringify({ error })
+}
+
+function wrapData (error, value) {
+  if (err) {
+    return { error }
+  } else if (value) {
+    return { value }
+  }
 }
 
 function isString (s) {

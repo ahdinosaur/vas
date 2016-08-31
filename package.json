@@ -64,6 +64,7 @@
     "pull-json-doubleline": "github:ahdinosaur/pull-json-doubleline#v2",
     "pull-serializer": "^0.3.2",
     "pull-stream": "^3.4.3",
+    "serialize-error": "^2.0.0",
     "set-in": "^2.0.0",
     "simple-get": "^2.2.2",
     "stack": "^0.1.0"
