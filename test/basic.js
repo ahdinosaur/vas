@@ -21,24 +21,23 @@ test('can create a client and server streams', function (t) {
     }
   }
 
-  var client = vas.createClient(service, {})
-  var server = vas.createServer(service, {})
+  var server = vas.listen(service, {}, {
+    port: 7890,
+    onListen: run
+  })
+  var client = vas.connect(service, {
+    url: 'http://localhost:7890'
+  })
 
-  var clientStream = client.createStream()
-  var serverStream = server.createStream()
+  function run () {
+    pull(
+      client.people.find(),
+      pull.collect(function (err, arr) {
+        t.error(err)
+        t.deepEqual(arr, expected)
 
-  pull(
-    clientStream,
-    serverStream,
-    clientStream
-  )
-
-  pull(
-    client.people.find(),
-    pull.collect(function (err, arr) {
-      t.error(err)
-      t.deepEqual(arr, expected)
-      t.end()
-    })
-  )
+        server.close(t.end)
+      })
+    )
+  }
 })

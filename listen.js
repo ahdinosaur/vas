@@ -1,4 +1,3 @@
-const pull = require('pull-stream')
 const defined = require('defined')
 const http = require('http')
 const Stack = require('stack')

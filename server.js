@@ -1,8 +1,6 @@
 const setIn = require('set-in')
-const getIn = require('get-in')
 const defined = require('defined')
 
-const defaultSerialize = require('./serialize')
 const walk = require('./walk')
 
 module.exports = createServer

@@ -1,17 +1,13 @@
 var setIn = require('set-in')
 var defined = require('defined')
 
-var defaultSerialize = require('./serialize')
 var walk = require('./walk')
 
 module.exports = createClient
 
-function createClient (services, config, options) {
+function createClient (services, options) {
   services = defined(services, [])
-  config = defined(config, {})
   options = defined(options, {})
-
-  var serialize = defined(options.serialize, defaultSerialize)
 
   var client = {
     manifest: {}

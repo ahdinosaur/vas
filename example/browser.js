@@ -18,9 +18,11 @@ pull(
 )
 
 client.things.getAsync({ id: 1 }, function (err, thing) {
+  if (err) throw err
   console.log('async got thing', thing)
 })
 
 client.things.getSync({ id: 2 }, function (err, thing) {
+  if (err) throw err
   console.log('sync got thing', thing)
 })

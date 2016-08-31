@@ -20,7 +20,7 @@ function createHttpServerHandler (server, options) {
     const context = { id: req.id }
     const type = getIn(server.manifest, name)
     const call = getIn(server.methods, name).bind(context)
-    
+
     if (!(type && call)) return next()
 
     switch (type) {
@@ -81,20 +81,4 @@ function stringifyValue (value) {
 function stringifyError (err) {
   const error = serializeError(err)
   return stringify({ error })
-}
-
-function wrapData (error, value) {
-  if (err) {
-    return { error }
-  } else if (value) {
-    return { value }
-  }
-}
-
-function isString (s) {
-  return 'string' === typeof s
-}
-
-function isObject (o) {
-  return o && 'object' === typeof o
 }

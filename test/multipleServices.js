@@ -40,30 +40,30 @@ test('can create client and server streams with multiple services', function (t)
     }
   ]
 
-  var client = vas.createClient(services, {})
-  var server = vas.createServer(services, {})
+  var server = vas.listen(services, {}, {
+    port: 7891,
+    onListen: run
+  })
+  var client = vas.connect(services, {
+    url: 'http://localhost:7891'
+  })
 
-  var clientStream = client.createStream()
-  var serverStream = server.createStream()
+  function run () {
+    pull(
+      client.people.find(),
+      pull.collect(function (err, arr) {
+        t.error(err)
+        t.deepEqual(arr, expectedPeople)
+      })
+    )
+    pull(
+      client.cats.find(),
+      pull.collect(function (err, arr) {
+        t.error(err)
+        t.deepEqual(arr, expectedCats)
 
-  pull(
-    clientStream,
-    serverStream,
-    clientStream
-  )
-
-  pull(
-    client.people.find(),
-    pull.collect(function (err, arr) {
-      t.error(err)
-      t.deepEqual(arr, expectedPeople)
-    })
-  )
-  pull(
-    client.cats.find(),
-    pull.collect(function (err, arr) {
-      t.error(err)
-      t.deepEqual(arr, expectedCats)
-    })
-  )
+        server.close(t.end)
+      })
+    )
+  }
 })

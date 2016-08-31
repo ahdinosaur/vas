@@ -38,29 +38,30 @@ test('can create client and server streams with nested services', function (t) {
     }]
   }
 
-  var client = vas.createClient(service, {})
-  var server = vas.createServer(service, {})
-  var clientStream = client.createStream()
-  var serverStream = server.createStream()
+  var server = vas.listen(service, {}, {
+    port: 7892,
+    onListen: run
+  })
+  var client = vas.connect(service, {
+    url: 'http://localhost:7892'
+  })
 
-  pull(
-    clientStream,
-    serverStream,
-    clientStream
-  )
+  function run () {
+    pull(
+      client.cats.find(),
+      pull.collect(function (err, arr) {
+        t.error(err)
+        t.deepEqual(arr, expectedCats)
+      })
+    )
+    pull(
+      client.cats.people.find(),
+      pull.collect(function (err, arr) {
+        t.error(err)
+        t.deepEqual(arr, expectedPeople)
 
-  pull(
-    client.cats.find(),
-    pull.collect(function (err, arr) {
-      t.error(err)
-      t.deepEqual(arr, expectedCats)
-    })
-  )
-  pull(
-    client.cats.people.find(),
-    pull.collect(function (err, arr) {
-      t.error(err)
-      t.deepEqual(arr, expectedPeople)
-    })
-  )
+        server.close(t.end)
+      })
+    )
+  }
 })

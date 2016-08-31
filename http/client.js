@@ -1,6 +1,5 @@
 var defined = require('defined')
 var Url = require('url')
-var getIn = require('get-in')
 var Path = require('path')
 var pullHttp = require('pull-http-client')
 var pull = require('pull-stream')
@@ -14,7 +13,7 @@ function createHttpClient (client, options) {
 
   var serialize = defined(options.serialize, defaultSerialize)
   var manifest = client.manifest
-  var url = options.url
+  var url = defined(options.url, '/')
   var base = isObject(url) ? url : Url.parse(url)
 
   return map(manifest, [], function (name, type) {
@@ -33,7 +32,7 @@ function createHttpClient (client, options) {
         json: true,
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         }
       }
 
@@ -51,7 +50,7 @@ function createHttpClient (client, options) {
             pull.asyncMap(handleData)
           )
         case 'sink':
-          httpOpts.headers['Content-Type'] = 'application/json; boundary=NLNL',
+          httpOpts.headers['Content-Type'] = 'application/json; boundary=NLNL'
           httpOpts.headers['Transfer-Encoding'] = 'chunked'
           return pull(
             serialize.stringify(),
@@ -74,9 +73,9 @@ function handleData (data, cb) {
   }
 }
 
-function map(manifest, name, fn) {
+function map (manifest, name, fn) {
   var o = {}
-  for(var key in manifest) {
+  for (var key in manifest) {
     var value = manifest[key]
     if (value == null) continue
     o[key] = (
@@ -89,9 +88,9 @@ function map(manifest, name, fn) {
 }
 
 function isObject (o) {
-  return o && 'object' === typeof o
+  return o && typeof o === 'object'
 }
 
 function isString (s) {
-  return 'string' === typeof s
+  return typeof s === 'string'
 }
