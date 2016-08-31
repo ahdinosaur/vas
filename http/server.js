@@ -16,8 +16,9 @@ function createHttpServerHandler (server, options) {
     const name = url.pathname.split('/').slice(1)
     const options = url.query
 
+    const context = { id: req.id }
     const type = getIn(server.manifest, name)
-    const call = getIn(server.methods, name)
+    const call = getIn(server.methods, name).bind(context)
     
     if (!(type && call)) return next()
 
