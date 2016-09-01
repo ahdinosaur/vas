@@ -4,6 +4,8 @@ const getProp = require('@f/get-prop')
 const toPull = require('stream-to-pull-stream')
 const pull = require('pull-stream')
 const serializeError = require('serialize-error')
+const identify = require('pull-identify-filetype')
+const mime = require('mime-types')
 
 const defaultSerialize = require('../serialize')
 
@@ -31,18 +33,25 @@ function createHttpServerHandler (server, options) {
 
     switch (type.stream) {
       case 'source':
-        if (type.binary) {
-          res.setHeader('Content-Type', 'application/octet-stream')
-        } else {
+        if (!type.binary) {
           res.setHeader('Content-Type', 'application/json; boundary=NLNL')
         }
 
         return pull(
           call(options),
-          type.binary ? pull.through() : pull(
-            pull.map(value => ({ value })),
-            serialize.stringify()
-          ),
+          type.binary
+            ? identify(function (filetype) {
+              if (filetype) {
+                res.setHeader('Content-Type', mime.lookup(filetype))
+              } else {
+                res.setHeader('Content-Type', 'application/octet-stream')
+              }
+            })
+            : pull(
+              pull.map(value => ({ value })),
+              serialize.stringify()
+            )
+          ,
           toPull.sink(res, function (err) {
             if (err) {
               res.end(stringifyError(err))
