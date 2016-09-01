@@ -56,6 +56,7 @@ function createHttpClient (client, options) {
             httpOpts.headers['Accept'] = 'application/json; boundary=NLNL'
           }
           httpOpts.headers['Transfer-Encoding'] = 'chunked'
+
           return pull(
             pullHttp.source(httpOpts),
             serialize.parse(),
@@ -70,8 +71,12 @@ function createHttpClient (client, options) {
           }
           httpOpts.headers['Transfer-Encoding'] = 'chunked'
           return pull(
-            serialize.stringify(),
-            pullHttp.sink(httpOpts, cb || ifErrorThrow)
+            type.binary ? pull.through() : serialize.stringify(),
+            pullHttp.sink(httpOpts, function (err, data) {
+              const callback = cb || ifErrorThrow
+              if (err) callback(err)
+              else handleData(data, callback)
+            })
           )
       }
     }
