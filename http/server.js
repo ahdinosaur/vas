@@ -1,6 +1,6 @@
 const Url = require('url')
 const defined = require('defined')
-const getIn = require('get-in')
+const getProp = require('@f/get-prop')
 const toPull = require('stream-to-pull-stream')
 const pull = require('pull-stream')
 const serializeError = require('serialize-error')
@@ -18,18 +18,31 @@ function createHttpServerHandler (server, options) {
     const options = url.query
 
     const context = { id: req.id }
-    const type = getIn(server.manifest, name)
-    const call = getIn(server.methods, name).bind(context)
+    var type = getProp(name, server.manifest)
+    const call = getProp(name, server.methods).bind(context)
 
     if (!(type && call)) return next()
 
-    switch (type) {
+    const binary = type[type.length - 1] === '.'
+    type = {
+      stream: binary ? type.substring(0, type.length - 1) : type,
+      binary: binary
+    }
+
+    switch (type.stream) {
       case 'source':
-        res.setHeader('Content-Type', 'application/json; boundary=NLNL')
+        if (type.binary) {
+          res.setHeader('Content-Type', 'application/octet-stream')
+        } else {
+          res.setHeader('Content-Type', 'application/json; boundary=NLNL')
+        }
+
         return pull(
           call(options),
-          pull.map(value => ({ value })),
-          serialize.stringify(),
+          type.binary ? pull.through() : pull(
+            pull.map(value => ({ value })),
+            serialize.stringify()
+          ),
           toPull.sink(res, function (err) {
             if (err) {
               res.end(stringifyError(err))
@@ -39,8 +52,7 @@ function createHttpServerHandler (server, options) {
       case 'sink':
         return pull(
           toPull.source(req),
-          pull.through(console.log),
-          serialize.parse(),
+          type.binary ? pull.through() : serialize.parse(),
           call(options, cb)
         )
       case 'async':
@@ -56,14 +68,21 @@ function createHttpServerHandler (server, options) {
     }
 
     function cb (err, value) {
-      res.setHeader('Content-Type', 'application/json')
-
       if (err) {
+        res.setHeader('Content-Type', 'application/json')
         res.statusCode = 500
         res.end(stringifyError(err))
-      } else {
-        res.end(stringifyValue(value))
+        return
       }
+
+      if (typeof value === 'string') {
+        res.setHeader('Content-Type', 'text/plain')
+      } else if (Buffer.isBuffer(value)) {
+        res.setHeader('Content-Type', 'application/octet-stream')
+      } else {
+        res.setHeader('Content-Type', 'application/json')
+      }
+      res.end(stringifyValue(value))
     }
   }
 

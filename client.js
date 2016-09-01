@@ -1,4 +1,4 @@
-var setIn = require('set-in')
+var setProp = require('@f/set-prop')
 var defined = require('defined')
 
 var walk = require('./walk')
@@ -15,7 +15,7 @@ function createClient (services, options) {
 
   walk(services, function (service, path) {
     // merge manifest
-    setIn(client.manifest, path, service.manifest)
+    client.manifest = setProp(path, client.manifest, service.manifest)
   })
 
   return client

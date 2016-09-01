@@ -14,9 +14,15 @@ function createHttpClient (client, options) {
   var serialize = defined(options.serialize, defaultSerialize)
   var manifest = client.manifest
   var url = defined(options.url, '/')
-  var base = isObject(url) ? url : Url.parse(url)
+  var base = typeof url === 'object' ? url : Url.parse(url)
 
   return map(manifest, [], function (name, type) {
+    const binary = type[type.length - 1] === '.'
+    type = {
+      stream: binary ? type.substring(0, type.length - 1) : type,
+      binary: binary
+    }
+
     return function (options, cb) {
       var url = Url.format({
         protocol: base.protocol,
@@ -36,7 +42,7 @@ function createHttpClient (client, options) {
         }
       }
 
-      switch (type) {
+      switch (type.stream) {
         case 'async':
         case 'sync':
           return pullHttp.async(httpOpts, function (err, data) {
@@ -44,13 +50,24 @@ function createHttpClient (client, options) {
             handleData(data, cb)
           })
         case 'source':
+          if (type.binary) {
+            httpOpts.headers['Accept'] = 'application/octet-stream'
+          } else {
+            httpOpts.headers['Accept'] = 'application/json; boundary=NLNL'
+          }
+          httpOpts.headers['Transfer-Encoding'] = 'chunked'
           return pull(
             pullHttp.source(httpOpts),
             serialize.parse(),
             pull.asyncMap(handleData)
           )
         case 'sink':
-          httpOpts.headers['Content-Type'] = 'application/json; boundary=NLNL'
+          httpOpts.method = 'POST'
+          if (type.binary) {
+            httpOpts.headers['Content-Type'] = 'application/octet-stream'
+          } else {
+            httpOpts.headers['Content-Type'] = 'application/json; boundary=NLNL'
+          }
           httpOpts.headers['Transfer-Encoding'] = 'chunked'
           return pull(
             serialize.stringify(),
@@ -79,18 +96,10 @@ function map (manifest, name, fn) {
     var value = manifest[key]
     if (value == null) continue
     o[key] = (
-      isString(value) ? fn(name.concat(key), value)
-    : isObject(value) ? map(value, name.concat(key), fn)
+      typeof value === 'string' ? fn(name.concat(key), value)
+    : (o && typeof value === 'object') ? map(value, name.concat(key), fn)
     : (function () { throw new Error('invalid manifest:' + value) })()
     )
   }
   return o
-}
-
-function isObject (o) {
-  return o && typeof o === 'object'
-}
-
-function isString (s) {
-  return typeof s === 'string'
 }

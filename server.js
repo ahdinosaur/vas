@@ -1,4 +1,4 @@
-const setIn = require('set-in')
+const setProp = require('@f/set-prop')
 const defined = require('defined')
 
 const walk = require('./walk')
@@ -19,11 +19,11 @@ function createServer (services, config, options) {
 
   walk(services, function (service, path) {
     // merge manifest
-    setIn(server.manifest, path, service.manifest)
+    server.manifest = setProp(path, server.manifest, service.manifest)
     // merge methods by calling service.init(service, config)
-    setIn(server.methods, path, service.methods && service.methods(server, config))
+    server.methods = setProp(path, server.methods, service.methods && service.methods(server, config))
     // merge permissions
-    setIn(server.permissions, path, service.permissions && service.permissions(server, config))
+    server.permission = setProp(path, server.permissions, service.permissions && service.permissions(server, config))
     // merge http handlers
     if (service.handlers) server.handlers = server.handlers.concat(service.handlers(server, config))
     if (!server.authenticate && service.authenticate) server.authenticate = service.authenticate(server, config)
