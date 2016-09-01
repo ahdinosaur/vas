@@ -37,6 +37,10 @@ function createHttpServerHandler (server, options) {
           res.setHeader('Content-Type', 'application/json; boundary=NLNL')
         }
 
+        if (type.binary && options.filename) {
+          res.setHeader('Content-Discosition', 'inline; filename='+options.filename)
+        }
+
         return pull(
           call(options),
           type.binary
