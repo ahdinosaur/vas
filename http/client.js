@@ -18,7 +18,7 @@ function createHttpClient (client, options) {
   var base = typeof url === 'object' ? url : Url.parse(url)
 
   return map(manifest, [], function (name, type) {
-    const binary = type[type.length - 1] === '.'
+    var binary = type[type.length - 1] === '.'
     type = {
       stream: binary ? type.substring(0, type.length - 1) : type,
       binary: binary
@@ -36,7 +36,7 @@ function createHttpClient (client, options) {
       })
       var httpOpts = {
         url: url,
-        json: true,
+        json: !type.binary,
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
@@ -74,7 +74,7 @@ function createHttpClient (client, options) {
           return pull(
             type.binary ? pull.through() : serialize.stringify(),
             pullHttp.sink(httpOpts, function (err, data) {
-              const callback = cb || ifErrorThrow
+              var callback = cb || ifErrorThrow
               if (err) callback(err)
               else handleData(data, callback)
             })

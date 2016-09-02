@@ -23,9 +23,11 @@ function createHttpServerHandler (server, options) {
 
     const context = { id: req.id }
     var type = getProp(name, server.manifest)
-    const call = getProp(name, server.methods).bind(context)
+    var call = getProp(name, server.methods)
 
     if (!(type && call)) return next()
+
+    call = call.bind(context)
 
     const binary = type[type.length - 1] === '.'
     type = {
