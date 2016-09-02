@@ -6,6 +6,8 @@ const pull = require('pull-stream')
 const serializeError = require('serialize-error')
 const identify = require('pull-identify-filetype')
 const mime = require('mime-types')
+const Qs = require('qs')
+const QsTypes = require('query-types')
 
 const defaultSerialize = require('../serialize')
 
@@ -15,9 +17,9 @@ function createHttpServerHandler (server, options) {
   const serialize = defined(options.serialize, defaultSerialize)
 
   const handler = function (req, res, next) {
-    const url = Url.parse(req.headers.host + req.url, true)
+    const url = Url.parse(req.headers.host + req.url)
     const name = url.pathname.split('/').slice(1)
-    const options = url.query
+    const options = queryParse(url.query)
 
     const context = { id: req.id }
     var type = getProp(name, server.manifest)
@@ -113,4 +115,8 @@ function stringifyValue (value) {
 function stringifyError (err) {
   const error = serializeError(err)
   return stringify({ error })
+}
+
+function queryParse (str) {
+  return QsTypes.parseObject(Qs.parse(str))
 }

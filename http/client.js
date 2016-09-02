@@ -3,6 +3,7 @@ var Url = require('url')
 var Path = require('path')
 var pullHttp = require('pull-http-client')
 var pull = require('pull-stream')
+var Qs = require('qs')
 
 var defaultSerialize = require('../serialize')
 
@@ -31,7 +32,7 @@ function createHttpClient (client, options) {
           base.pathname || '/',
           name.join('/')
         ),
-        query: options
+        search: '?' + Qs.stringify(options)
       })
       var httpOpts = {
         url: url,

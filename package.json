@@ -66,6 +66,8 @@
     "pull-identify-filetype": "^1.1.0",
     "pull-json-doubleline": "github:ahdinosaur/pull-json-doubleline#v2",
     "pull-stream": "^3.4.3",
+    "qs": "^6.2.1",
+    "query-types": "^0.1.4",
     "serialize-error": "^2.0.0",
     "stack": "^0.1.0",
     "stream-to-pull-stream": "^1.7.0"
