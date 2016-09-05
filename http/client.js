@@ -60,8 +60,12 @@ function createHttpClient (client, options) {
 
           return pull(
             pullHttp.source(httpOpts),
-            serialize.parse(),
-            pull.asyncMap(handleData)
+            type.binary
+              ? pull.through()
+              : pull(
+                serialize.parse(),
+                pull.asyncMap(handleData)
+              )
           )
         case 'sink':
           httpOpts.method = 'POST'
