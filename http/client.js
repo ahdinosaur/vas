@@ -65,6 +65,7 @@ function createHttpClient (client, options) {
           )
         case 'sink':
           httpOpts.method = 'POST'
+          httpOpts.json = true
           if (type.binary) {
             httpOpts.headers['Content-Type'] = 'application/octet-stream'
           } else {
