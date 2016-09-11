@@ -85,14 +85,19 @@ function createHttpServerHandler (server, options) {
     }
 
     function cb (err, value) {
+      if (res.finished) return
+
       if (err) {
-        res.setHeader('Content-Type', 'application/json')
-        res.statusCode = 500
+        if (!res.headersSent) {
+          res.setHeader('Content-Type', 'application/json')
+          res.statusCode = 500
+        }
         res.end(stringifyError(err))
         return
       }
 
-      if (typeof value === 'string') {
+      if (res.headersSent) {}
+      else if (typeof value === 'string') {
         res.setHeader('Content-Type', 'text/plain')
       } else if (Buffer.isBuffer(value)) {
         res.setHeader('Content-Type', 'application/octet-stream')
