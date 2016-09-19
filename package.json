@@ -62,7 +62,7 @@
     "mime-types": "^2.1.11",
     "muxrpcli": "^1.0.5",
     "pull-identify-filetype": "^1.1.0",
-    "pull-json-doubleline": "github:ahdinosaur/pull-json-doubleline#v2",
+    "pull-json-doubleline": "^2.0.0",
     "pull-stream": "^3.4.3",
     "pull-xhr": "^1.0.6",
     "qs": "^6.2.1",
