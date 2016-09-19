@@ -1,4 +1,5 @@
 var defined = require('defined')
+var extend = require('xtend')
 var Url = require('url')
 var Path = require('path')
 var xhr = require('pull-xhr')
@@ -25,6 +26,10 @@ function createHttpClient (client, options) {
     }
 
     return function (options, cb) {
+      options = extend(options)
+      var xhrOptions = options.xhrOptions
+      delete options.xhrOptions
+
       var url = Url.format({
         protocol: base.protocol,
         host: base.host,
@@ -34,11 +39,11 @@ function createHttpClient (client, options) {
         ),
         search: '?' + Qs.stringify(options)
       })
-      var xhrOpts = {
+      var xhrOpts = extend(xhrOptions, {
         url: url,
-        responseType: type.binary ? 'arraybuffer' : 'json',
-        headers: {}
-      }
+        responseType: type.binary ? 'arraybuffer' : 'json'
+      })
+      xhrOpts.headers = extend(xhrOpts.headers, {})
 
       switch (type.stream) {
         case 'async':

@@ -70,6 +70,7 @@
     "serialize-error": "^2.0.0",
     "set-in": "^2.0.0",
     "stack": "^0.1.0",
-    "stream-to-pull-stream": "^1.7.0"
+    "stream-to-pull-stream": "^1.7.0",
+    "xtend": "^4.0.1"
   }
 }
