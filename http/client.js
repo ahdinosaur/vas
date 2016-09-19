@@ -1,7 +1,7 @@
 var defined = require('defined')
 var Url = require('url')
 var Path = require('path')
-var pullHttp = require('pull-http-client')
+var xhr = require('pull-xhr')
 var pull = require('pull-stream')
 var Qs = require('qs')
 
@@ -34,32 +34,22 @@ function createHttpClient (client, options) {
         ),
         search: '?' + Qs.stringify(options)
       })
-      var httpOpts = {
+      var xhrOpts = {
         url: url,
-        json: !type.binary,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
+        responseType: type.binary ? 'arraybuffer' : 'json',
+        headers: {}
       }
 
       switch (type.stream) {
         case 'async':
         case 'sync':
-          return pullHttp.async(httpOpts, function (err, data) {
+          return xhr.async(xhrOpts, function (err, data) {
             if (err) return cb(err)
             handleData(data, cb)
           })
         case 'source':
-          if (type.binary) {
-            httpOpts.headers['Accept'] = 'application/octet-stream'
-          } else {
-            httpOpts.headers['Accept'] = 'application/json; boundary=NLNL'
-          }
-          httpOpts.headers['Transfer-Encoding'] = 'chunked'
-
           return pull(
-            pullHttp.source(httpOpts),
+            xhr.source(xhrOpts),
             type.binary
               ? pull.through()
               : pull(
@@ -68,22 +58,13 @@ function createHttpClient (client, options) {
               )
           )
         case 'sink':
-          httpOpts.method = 'POST'
-          httpOpts.json = true
-          if (type.binary) {
-            httpOpts.headers['Content-Type'] = 'application/octet-stream'
-          } else {
-            httpOpts.headers['Content-Type'] = 'application/json; boundary=NLNL'
-          }
-          httpOpts.headers['Transfer-Encoding'] = 'chunked'
-          return pull(
-            type.binary ? pull.through() : serialize.stringify(),
-            pullHttp.sink(httpOpts, function (err, data) {
-              var callback = cb || ifErrorThrow
-              if (err) callback(err)
-              else handleData(data, callback)
-            })
-          )
+          xhrOpts.method = 'POST'
+          xhrOpts.responseType = 'json'
+          return xhr.sink(xhrOpts, function (err, data) {
+            var callback = cb || ifErrorThrow
+            if (err) callback(err)
+            else handleData(data, callback)
+          })
       }
     }
   })
