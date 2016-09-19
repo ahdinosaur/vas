@@ -1,6 +1,6 @@
 const Url = require('url')
 const defined = require('defined')
-const getProp = require('@f/get-prop')
+const getIn = require('get-in')
 const toPull = require('stream-to-pull-stream')
 const pull = require('pull-stream')
 const serializeError = require('serialize-error')
@@ -22,8 +22,8 @@ function createHttpServerHandler (server, options) {
     const options = queryParse(url.query)
 
     const context = { id: req.id }
-    var type = getProp(name, server.manifest)
-    var call = getProp(name, server.methods)
+    var type = getIn(server.manifest, name)
+    var call = getIn(server.methods, name)
 
     if (!(type && call)) return next()
 
