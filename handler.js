@@ -6,9 +6,10 @@ var methodName = require('./lib/methodName')
 
 module.exports = Handler
 
-function Handler (methods, hooks) {
+function Handler (server) {
   return function handler (type, path, args, cb) {
-    var method = getIn(methods, path)
+    var method = getIn(server.methods, path)
+    var hooks = getIn(server.hooks, path, [])
 
     if (method === undefined) {
       cb(new Error('method ' + methodName(path) + ' is not implemented.'))
@@ -19,7 +20,6 @@ function Handler (methods, hooks) {
       method = syncToAsync(method)
     }
 
-    var hooks = getIn(hooks, path, [])
     var hookedMethod = applyHooks(method, hooks)
 
     hookedMethod.apply(this, args.concat(cb))

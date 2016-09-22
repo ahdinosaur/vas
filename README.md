@@ -241,7 +241,7 @@ a `vas` service is defined by an object with the following keys:
 - `version` (optional): a string semantic version
 - `manifest`: an object [muxrpc manifest](https://github.com/ssbc/muxrpc#manifest)
 - `methods`: a `methods(server, config)` pure function that returns an object of method functions to pass into [`muxrpc`](https://github.com/ssbc/muxrpc)
-- `permissions`: a `permissions(server, config)` pure function that returns an object of permission functions which correspond to methods. each permission function accepts the same arguments as the method and can return an optional `new Error(...)` if the method should not be called.
+- `hooks`: a `hooks(server, config)` pure function that returns an object of hooks which correspond to methods. each hook is an tuple of shape `[type, fn]`, where `type` is either [`around`, `before`, or `after`](https://github.com/ahdinosaur/aspects) and `fn` is an asynchronous function that accepts the same arguments as the method (and an additional callback if the method is not `async`).
 - `handlers` a `handlers(server, config)` pure function that returns an array of http request handler functions, each of shape `(req, res, next) => { next() }`.
 - `authenticate`: a `authenticate(server, config)` pure function that returns an authentication function, of shape `(req, cb) => cb(err, id)`. only the first `authenticate` function will be used for a given set of services. the `id` returned by `authenticate` will be available as `this.id` in method or permission functions and `req.id` in handler functions.
 - `services`: any recursive sub-services
