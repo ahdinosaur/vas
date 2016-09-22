@@ -4,5 +4,6 @@ module.exports = {
   listen: require('./listen'),
   connect: require('./connect'),
   command: require('./command'),
+  Xhr: require('pull-xhr'),
   pull: require('pull-stream')
 }
