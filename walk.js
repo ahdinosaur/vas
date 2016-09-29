@@ -1,20 +1,20 @@
+const isArray = Array.isArray
+
 module.exports = walk
 
-function walk (services, cb, path) {
-  path = path || []
-
-  if (!Array.isArray(services)) {
+function walk (services, cb, path = []) {
+  if (!isArray(services)) {
     services = [services]
   }
 
   services.forEach(function (service) {
-    var name = service.name
-    var servicePath = path.concat([name])
+    const { name, services } = service
+    const servicePath = path.concat([name])
 
     cb(service, servicePath)
 
-    if (service.services) {
-      walk(service.services, cb, servicePath)
+    if (services) {
+      walk(services, cb, servicePath)
     }
   })
 }

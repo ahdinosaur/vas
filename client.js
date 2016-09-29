@@ -1,14 +1,10 @@
-var setIn = require('set-in')
-var defined = require('defined')
+const setIn = require('set-in')
 
-var walk = require('./walk')
+const walk = require('./walk')
 
 module.exports = Client
 
-function Client (services, config) {
-  services = defined(services, [])
-  config = defined(config, {})
-
+function Client (services = [], config = {}) {
   var client = {
     manifest: {}
   }

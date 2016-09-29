@@ -1,14 +1,11 @@
-var setIn = require('set-in')
-var defined = require('defined')
+const setIn = require('set-in')
 
-var walk = require('./walk')
+const walk = require('./walk')
+const { authenticate } = require('./defaults')
 
 module.exports = Server
 
-function Server (services, config) {
-  services = defined(services, [])
-  config = defined(config, {})
-
+function Server (services = [], config = {}) {
   var server = {
     manifest: {},
     permissions: {},
@@ -30,11 +27,7 @@ function Server (services, config) {
     if (!server.authenticate && service.authenticate) server.authenticate = service.authenticate(server, config)
   })
 
-  if (!server.authenticate) server.authenticate = defaultAuthenticate
+  if (!server.authenticate) server.authenticate = authenticate
 
   return server
-}
-
-function defaultAuthenticate (req, cb) {
-  cb(null, null)
 }

@@ -5,14 +5,16 @@
   "main": "index.js",
   "browser": "browser.js",
   "scripts": {
-    "test:deps": "dependency-check . && dependency-check . --extra --no-dev",
+    "test:deps": "dependency-check . && dependency-check . --extra --no-dev -i es2040",
     "test:lint": "standard",
     "test:node": "NODE_ENV=test tape test/*.js",
     "test:coverage": "NODE_ENV=test istanbul cover test",
     "test": "npm-run-all -s test:deps test:lint test:node"
   },
   "browserify": {
-    "transform": []
+    "transform": [
+      "es2040"
+    ]
   },
   "repository": {
     "type": "git",
@@ -44,10 +46,9 @@
   },
   "dependencies": {
     "aspects": "^1.0.2",
-    "defined": "^1.0.0",
+    "es2040": "^1.2.3",
     "get-in": "^3.0.1",
     "pull-stream": "^3.4.5",
-    "set-in": "^2.0.0",
-    "sliced": "^1.0.1"
+    "set-in": "^2.0.0"
   }
 }

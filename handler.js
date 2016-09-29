@@ -1,15 +1,15 @@
-var getIn = require('get-in')
-var aspects = require('aspects').async
+const getIn = require('get-in')
+const aspects = require('aspects').async
 
-var syncToAsync = require('./lib/syncToAsync')
-var methodName = require('./lib/methodName')
+const syncToAsync = require('./lib/syncToAsync')
+const methodName = require('./lib/methodName')
 
 module.exports = Handler
 
-function Handler (server) {
+function Handler ({ methods, hooks }) {
   return function handler (type, path, args, cb) {
-    var method = getIn(server.methods, path)
-    var hooks = getIn(server.hooks, path, [])
+    var method = getIn(methods, path)
+    const hooks = getIn(hooks, path, [])
 
     if (method === undefined) {
       cb(new Error('method ' + methodName(path) + ' is not implemented.'))
@@ -20,7 +20,7 @@ function Handler (server) {
       method = syncToAsync(method)
     }
 
-    var hookedMethod = applyHooks(method, hooks)
+    const hookedMethod = applyHooks(method, hooks)
 
     hookedMethod.apply(this, args.concat(cb))
   }
@@ -31,7 +31,7 @@ function applyHooks (fn, hooks) {
 }
 
 function applyHook (fn, hook) {
-  var hookType = hook[0]
-  var hookFn = hook[1]
+  const hookType = hook[0]
+  const hookFn = hook[1]
   return aspects[hookType](fn, hookFn)
 }
