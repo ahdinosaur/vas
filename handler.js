@@ -3,6 +3,8 @@ const aspects = require('aspects').async
 
 const syncToAsync = require('./lib/syncToAsync')
 const methodName = require('./lib/methodName')
+const abort = require('./lib/abort')
+const is = require('./lib/is')
 
 module.exports = Handler
 
@@ -11,18 +13,21 @@ function Handler ({ methods, hooks }) {
     var method = getIn(methods, path)
     const hooks = getIn(hooks, path, [])
 
-    if (method === undefined) {
-      cb(new Error('method ' + methodName(path) + ' is not implemented.'))
-      return
+    if (is.undefined(method)) {
+      return abort(type, cb, new Error('method ' + methodName(path) + ' is not implemented.'))
     }
 
-    if (type === 'sync') {
+    if (is.sync(type)) {
       method = syncToAsync(method)
     }
 
     const hookedMethod = applyHooks(method, hooks)
 
-    hookedMethod.apply(this, args.concat(cb))
+    if (is.request(type)) {
+      hookedMethod.apply(this, args.concat(cb))
+    } else {
+      return hookedMethod.apply(this, args)
+    }
   }
 }
 

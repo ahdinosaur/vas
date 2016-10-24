@@ -1,3 +1,5 @@
+const is = require('./lib/is')
+
 module.exports = Emitter
 
 function Emitter (manifest, handler) {
@@ -7,8 +9,7 @@ function Emitter (manifest, handler) {
     Object.keys(api).forEach(name => {
       const type = api[name]
       const currentPath = path.concat(name)
-      obj[name] =
-          type == null
+      obj[name] = is.object(type)
         ? recurse({}, type, currentPath)
         : Emit({ handler, type, path: currentPath })
     })
@@ -20,6 +21,9 @@ function Emitter (manifest, handler) {
 
 function Emit ({ handler, type, path }) {
   return function emit (...args) {
-    return handler.call(this, type, path, args)
+    if (is.request(type)) {
+      const cb = args.pop()
+    }
+    return handler.call(this, type, path, args, cb)
   }
 }
