@@ -141,11 +141,6 @@ pull(
 // all human
 // all computer
 // all JavaScript
-
-setTimeout(function () {
-  server.close()
-  client.close()
-}, 1000)
 ```
 
 for a more complete example, see [./example](./example), which you can run with `npm run example` and query using command-line using `npm run example:cli -- things.find`.

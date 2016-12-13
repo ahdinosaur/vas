@@ -1,18 +1,15 @@
-const setIn = require('set-in')
-
-const walk = require('./walk')
+const pull = require('pull-stream')
+const Pushable = require('pull-pushable')
 
 module.exports = Client
 
-function Client (services = [], config = {}) {
-  var client = {
-    manifest: {}
-  }
+function Client (service, options = {}) {
+  const { adapter } = options
+  const requests = Pushable()
 
-  walk(services, function (service, path) {
-    // merge manifest
-    setIn(client.manifest, path, service.manifest)
-  })
+  const stream = adapter(options)
 
-  return client
+  pull(requests, stream)
+
+  return emitter(service, requests.push, stream)
 }
