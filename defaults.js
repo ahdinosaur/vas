@@ -1,3 +1,5 @@
+const asyncMap = require('pull-stream/throughs/async-map')
+
 function authenticate (req, cb) {
   cb(null, null)
 }

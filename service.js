@@ -1,4 +1,7 @@
-const defaultAuthenticate = require('./authenticate')
+const setIn = require('set-in')
+
+const { authenticate: defaultAuthenticate } = require('./defaults')
+const walk = require('./walk')
 
 module.exports = Service
 

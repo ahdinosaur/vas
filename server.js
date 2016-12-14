@@ -1,8 +1,8 @@
+const Handler = require('./handler')
+
 module.exports = Server
 
-function Server (service, options = {}) {
-  const { adapter } = options
-
+function Server (service, adapter, options) {
   const handler = Handler(service)
 
   return adapter(handler, options)

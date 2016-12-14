@@ -48,7 +48,8 @@
     "aspects": "^1.0.2",
     "es2040": "^1.2.3",
     "get-in": "^3.0.1",
-    "pull-stream": "^3.4.5",
+    "pull-pushable": "^2.0.1",
+    "pull-stream": "^3.5.0",
     "set-in": "^2.0.0"
   }
 }

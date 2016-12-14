@@ -19,8 +19,9 @@ function Emitter ({ manifest }, handler, emitter = {}) {
 
 function Emit ({ handler, type, path }) {
   return function emit (...args) {
+    var cb
     if (is.request(type)) {
-      const cb = args.pop()
+      cb = args.pop()
     }
     return handler({ type, path, args, cb })
   }
