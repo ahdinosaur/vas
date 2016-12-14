@@ -1,13 +1,13 @@
-const { Service, Server, Client, pull } = require('./')
+const { Server, Client, pull } = require('./')
 const values = require('object-values')
 
-const serviceDefinition = {
+const service = {
   name: 'things',
   manifest: {
     all: 'source',
     get: 'async'
   },
-  init: function (server, config) {
+  init: function (config) {
     return {
       methods: { all, get }
     }
@@ -32,10 +32,10 @@ const config = {
   }
 }
 
-const { adapter } = require('./defaults')
-const service = Service(serviceDefinition, config)
-const server = Server(service, adapter.server)
-const client = Client(service, adapter.client, { server })
+const server = Server(service, config)
+const client = Client(service, config)
+  
+pull(client, server, client)
 
 client.things.get(1, (err, value) => {
   if(err) throw err

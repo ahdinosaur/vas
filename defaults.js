@@ -1,9 +1,5 @@
 const asyncMap = require('pull-stream/throughs/async-map')
 
-function authenticate (req, cb) {
-  cb(null, null)
-}
-
 const adapter = {
   // receive method calls
   // send method responses
@@ -20,6 +16,5 @@ const adapter = {
 }
 
 module.exports = {
-  authenticate,
   adapter
 }
