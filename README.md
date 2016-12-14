@@ -54,37 +54,37 @@
 ## features
 
 - **API is a data structure**: easy to understand and simple to extend
-- **functional**: methods, permissions, handlers are just functions, no magic
+- **functional**: services are just objects and functions, no magic
 - **fractal**: compose one API from many smaller APIs
 - **database-agnostic**: create API services on top of anything
-- **authentication**: identify who the current user is
-- **authorization**: permit what a user can do
-- **http stack**: same paradigm for http request handlers like front-end bundlers, blob stores, etc
+- **hookable**: hook before, after, and around methods 
+- **adaptable**: use adapters to transport over http, websockets
 - [**omakse**](https://youtu.be/E99FnoYqoII): consistent flavoring with [pull streams](https://pull-streams.github.io) all the way down
 
 for a user interface complement, see [`inu`](https://github.com/ahdinosaur/inu)
 
 ## demos
 
-- [holodex/app](https://github.com/holodex/app): full-stack user directory app using [`inu`](https://github.com/ahdinosaur/inu), [`inux`](https://github.com/ahdinosaur/inux), and [`vas`](https://github.com/ahdinosaur/vas)
+TODO
 
 *if you want to share anything using `vas`, add your thing here!*
 
 ## example
 
 ```js
-var vas = require('vas')
-var pull = vas.pull
-var values = require('object-values')
+const { Server, Client, pull } = require('vas')
+const values = require('object-values')
 
-var service = {
+const service = {
   name: 'things',
   manifest: {
     all: 'source',
     get: 'async'
   },
-  methods: function (server, config) {
-    return { all, get }
+  init: function (config) {
+    return {
+      methods: { all, get }
+    }
 
     function all () {
       const things = values(config.data)
@@ -94,28 +94,11 @@ var service = {
     function get (id, cb) {
       cb(null, config.data[id])
     }
-  },
-  permissions: function (server, config) {
-    return { get }
-
-    function get (id) {
-      if (id === 'nobody') {
-        return new Error('nobody is not allowed.')
-      }
-    }
-  },
-  handlers: function (server, config) {
-    return [
-      function (req, res, next) {
-        console.log('cookie:', req.headers.cookie)
-        next()
-      }
-    ]
   }
 }
 
 // could also attach db connection, file descriptors, etc.
-var config = {
+const config = {
   data: {
     1: 'human',
     2: 'computer',
@@ -123,10 +106,10 @@ var config = {
   }
 }
 
-var port = 6000
-var url = `ws://localhost:${port}`
-var server = vas.listen(service, config, { port })
-var client = vas.connect(service, config, { url })
+const server = Server(service, config)
+const client = Client(service, config)
+  
+pull(client, server, client)
 
 client.things.get(1, (err, value) => {
   if(err) throw err
@@ -215,7 +198,7 @@ together, this could become a _service_, complete with a name and version:
 const service = {
   name: 'todos',
   version: '1.0.0',
-  manfest,
+  manifest,
   methods
 }
 ```
@@ -234,82 +217,55 @@ a `vas` service is defined by an object with the following keys:
 
 - `name`: a string name
 - `version` (optional): a string semantic version
-- `manifest`: an object [muxrpc manifest](https://github.com/ssbc/muxrpc#manifest)
-- `methods`: a `methods(server, config)` pure function that returns an object of method functions to pass into [`muxrpc`](https://github.com/ssbc/muxrpc)
-- `hooks`: a `hooks(server, config)` pure function that returns an object of hooks which correspond to methods. each hook is an tuple of shape `[type, fn]`, where `type` is either [`around`, `before`, or `after`](https://github.com/ahdinosaur/aspects) and `fn` is an asynchronous function that accepts the same arguments as the method (and an additional callback if the method is not `async`).
-- `handlers` a `handlers(server, config)` pure function that returns an array of http request handler functions, each of shape `(req, res, next) => { next() }`.
-- `authenticate`: a `authenticate(server, config)` pure function that returns an authentication function, of shape `(req, cb) => cb(err, id)`. only the first `authenticate` function will be used for a given set of services. the `id` returned by `authenticate` will be available as `this.id` in method or permission functions and `req.id` in handler functions.
+- `manifest`: a manifest object mapping method names to strings representing the method type (`sync`, `async`, `source`, or `sink`)
+- `init`: a `(config, topService) => ({ methods, hooks })` pure function that returns
+  - `methods`: method functions.
+  - `hooks`: hooks which correspond to methods. each hook is an tuple of shape `[type, fn]`, where `type` is either [`around`, `before`, or `after`](https://github.com/ahdinosaur/aspects) and `fn` is an asynchronous function that accepts the same arguments as the method (and an additional callback if the method is not `async`).
 - `services`: any recursive sub-services
 
-many `vas` services can refer to a single service or an `Array` of services
+a `vas` service can refer to a single service or an `Array` of services
 
 ### `vas = require('vas')`
 
 the top-level `vas` module is a grab bag of all `vas/*` modules.
 
-you can also require each module separately like `require('vas/listen')`.
+you can also require each module separately like `require('vas/server')`.
 
-### `vas.listen(services, config, options)`
+### `vas.Server(service, config)`
 
-creates a server with `createServer(services, config)`, then
+creates a `vas` server from the service definition and any arbitrary config object (which will be passed into any sub-service `.init()` function).
 
-listens to a port and begins to handle requests from clients using [`pull-ws-server`](https://github.com/pull-stream/pull-ws-server)
+a `server` is a duplex pull-stream where:
 
-`options` is an object with the following (optional) keys:
+- `sink`: receives request objects `{ path, args, req }`
+- `source`: sends response objects `{ type, value, error, stream, res }` with `value` or `error` is a callback method or `stream` is a stream method.
 
-- `port`: port to open WebSocket server
-- `onListen`: function to call once server is listening, receives `(err, httpServer, wsServer)`.
-- `createHttpServer`: function to create http server, of shape `(handlers) => server`. default is `(handlers) => http.createServer(Stack(...handlers))`
-- `serialize`: a duplex pull stream to stringify and parse json objects being sent to and from methods
+### `vas.Client(service, config)`
 
-### `vas.connect(client, config, options)`
+creates a `vas` client from the service definition and any arbitrary config object (which will be passed into any sub-service `.init()` function).
 
-creates a client with `createClient(services, config)`, then
+a `client` is a duplex pull-stream where:
 
-connects the client to a server over websockets using [`pull-ws-server`](https://github.com/pull-stream/pull-ws-server)
+- `source`: sends request objects `{ path, args, req }`
+- `sink`: receives response objects `{ type, value, error, stream, res }` with `value` or `error` is a callback method or `stream` is a stream method.
 
-`options` is an object with the following (optional) keys:
+### `vas.pull(client, server, client)`
 
-- `url`: string or [object](https://nodejs.org/api/url.html#url_url_strings_and_url_objects) to refer to WebSocket server
-- `onConnect`: function to call once client is connected
-- `serialize`: a duplex pull stream to stringify and parse json objects being sent to and from methods
+`pull` is equivalent to `require('pull-stream')`.
 
-### `vas.command(services, config, options, argv)`
+using `pull(client, server, client)` connects the client and server duplex streams together.
 
-run a command on a server as a command-line interface using [`muxrpcli`](https://github.com/ssbc/muxrpcli)
+## adapters
 
-`options` are either those passed to `vas.listen` or `vas.connect`, depending on if `argv[0] === 'server'`
+TODO
 
-`argv` is expected to be `process.argv`.
+### `vas.http.listen(options)`
 
----
+returns a duplex stream to receive and send `vas` method responses and requests as http messages.
 
-### `server = vas.createServer(services, config, options)`
+### `vas.http.connect(options)`
 
-a `vas` server is an instantiation of a service that responds to requests.
-
-`createServer` returns an object that corresponds to the (recursive) services and respective methods returned by `methods`.
-
-`options` is an object with the following (optional) keys:
-
-- `serialize`: a duplex pull stream to stringify and parse json objects being sent to and from methods
-
-### `client = vas.createClient(services, config, options)`
-
-a `vas` client is a composition of manifests to makes requests.
-
-`createClient` returns an object that corresponds to the (recursive) services and respective methods in `manifest`.
-
-`options` is an object with the following (optional) keys:
-
-- `serialize`: a duplex pull stream to stringify and parse json objects being sent to and from methods
-
-### `server.createStream(id)`
-### `client.createStream(id)`
-
-returns a [duplex pull stream](https://github.com/dominictarr/pull-stream-examples/blob/master/duplex.js) using [`muxrpc`](https://github.com/ssbc/muxrpc)
-
-for a server, if `id` is passed in, will bind each method or permission function with `id` as `this.id`.
+returns a duplex stream to send and receive `vas` method requests and responses as http messages.
 
 ## frequently asked questions (FAQ)
 
@@ -334,6 +290,8 @@ to [`evalify`](https://github.com/ahdinosaur/evalify) only service files, where 
 ```
 
 ### how to do authentication
+
+TODO: re-write for v3
 
 authentication is answers the question of _who you are_.
 
@@ -402,6 +360,7 @@ npm install --save vas
 
 - [`big`](https://jfhbrook.github.io/2013/05/28/the-case-for-a-nodejs-framework.html)
 - [`feathers`](http://feathersjs.com/)
+- [`muxrpc`](https://github.com/ssbc/muxrpc)
 - [`secret-stack`](https://github.com/ssbc/secret-stack)
 
 ## license
