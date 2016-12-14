@@ -34,11 +34,11 @@ const config = {
 
 const server = Server(service, config)
 const client = Client(service, config)
-  
+
 pull(client, server, client)
 
 client.things.get(1, (err, value) => {
-  if(err) throw err
+  if (err) throw err
   console.log('get', value)
   // get human
 })

@@ -7,8 +7,8 @@
   "scripts": {
     "test:deps": "dependency-check . && dependency-check . --extra --no-dev -i es2040",
     "test:lint": "standard",
-    "test:node": "NODE_ENV=test tape test/*.js",
-    "test:coverage": "NODE_ENV=test istanbul cover test",
+    "test:node": "NODE_ENV=test bin/test",
+    "test:coverage": "NODE_ENV=test istanbul cover ./test.js",
     "test": "npm-run-all -s test:deps test:lint test:node"
   },
   "browserify": {
@@ -38,11 +38,13 @@
   },
   "homepage": "https://github.com/ahdinosaur/vas#readme",
   "devDependencies": {
-    "dependency-check": "^2.5.1",
-    "istanbul": "^0.4.4",
-    "npm-run-all": "^1.6.0",
+    "bulk-require": "^1.0.0",
+    "dependency-check": "^2.6.0",
+    "istanbul": "^0.4.5",
+    "npm-run-all": "^1.8.0",
     "standard": "^7.1.2",
-    "tape": "^4.6.0"
+    "tap-diff": "^0.1.1",
+    "tape": "^4.6.3"
   },
   "dependencies": {
     "aspects": "^1.0.2",
