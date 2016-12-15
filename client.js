@@ -1,4 +1,4 @@
-const pull = require('pull-stream')
+const drain = require('pull-stream/sinks/drain')
 const Pushable = require('pull-pushable')
 const Uuid = require('uuid')
 const Deferred = require('pull-defer')
@@ -15,7 +15,7 @@ function Client (service, options = {}) {
 
   var client = {
     source: requests,
-    sink: pull.drain(receive)
+    sink: drain(receive)
   }
 
   Emitter(service, send, client)

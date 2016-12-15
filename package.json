@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "aspects": "^1.0.2",
-    "es2040": "^1.2.3",
+    "es2040": "^1.2.4",
     "get-in": "^3.0.1",
     "pull-defer": "^0.2.2",
     "pull-pushable": "^2.0.1",
