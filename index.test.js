@@ -3,14 +3,14 @@ const test = require('tape')
 const { Server, Client, pull } = require('./')
 const values = require('object-values')
 
-test('vas exports Server, Client and pull functions', function(t) {
+test('vas exports Server, Client and pull functions', function (t) {
   t.equal(typeof Server, 'function', 'Server is a function')
   t.equal(typeof Client, 'function', 'Client is a function')
   t.equal(typeof pull, 'function', 'pull is a function')
   t.end()
 })
 
-test('hello world example works', function(t) {
+test('hello world example works', function (t) {
   t.plan(4)
   const service = {
     name: 'things',
@@ -60,5 +60,4 @@ test('hello world example works', function(t) {
       t.equal(arr.length, 3)
     })
   )
-
 })
