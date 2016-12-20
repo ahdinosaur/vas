@@ -41,7 +41,7 @@
     "bulk-require": "^1.0.0",
     "dependency-check": "^2.6.0",
     "istanbul": "^0.4.5",
-    "mock-xmlhttprequest": "^1.1.0",
+    "mock-xmlhttprequest": "github:ahdinosaur/mock-xmlhttprequest",
     "npm-run-all": "^1.8.0",
     "object-values": "^1.0.0",
     "standard": "^7.1.2",
