@@ -44,6 +44,7 @@
     "mock-xmlhttprequest": "^1.1.0",
     "npm-run-all": "^1.8.0",
     "object-values": "^1.0.0",
+    "pull-xhr": "^1.0.6",
     "standard": "^7.1.2",
     "tap-diff": "^0.1.1",
     "tape": "^4.6.3"
