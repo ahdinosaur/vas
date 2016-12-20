@@ -6,7 +6,7 @@ global.XMLHttpRequest = MockXMLHttpRequest
 
 const Connection = require('./connect')
 
-test('async request', t => {
+test.skip('async request', t => {
   const connection = Connection()
 
   global.XMLHttpRequest.onSend = (xhr) => {
