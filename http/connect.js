@@ -7,15 +7,13 @@ const Pushable = require('pull-pushable')
 const pullXhr = require('pull-xhr')
 
 const is = require('../lib/is')
-const { serialize: defaultSerialize } = require('../defaults')
 
 module.exports = createHttpConnection
 
 function createHttpConnection (options = {}) {
   const {
     url = '/',
-    xhrOptions = {},
-    serialize = defaultSerialize
+    xhrOptions = {}
   } = options
   const base = is.object(url) ? url : Url.parse(url)
 
@@ -32,7 +30,6 @@ function createHttpConnection (options = {}) {
   return connection
 
   function send (request) {
-    console.log('send', request)
     const { type, path, args } = request
 
     const url = Url.format({
@@ -58,10 +55,10 @@ function createHttpConnection (options = {}) {
         )
         break
       case 'source':
-        pull(
-          pullXhr.source(xhrOpts),
-          serialize.parse(),
-          drain(resolve)
+        resolveStream(
+          pullXhr.source(
+            extend(xhrOpts, { json: args })
+          )
         )
         break
       case 'sink':
@@ -72,11 +69,17 @@ function createHttpConnection (options = {}) {
           requestStream,
           pullXhr.sink(xhrOptions, cb)
         )
+        resolveStream(drain(requestStream.push))
+        break
     }
 
     function cb (err, data) {
       if (err) abort(err)
       else resolve(extend(request, data))
+    }
+
+    function resolveStream (stream) {
+      resolve(extend(request, { stream }))
     }
   }
 
