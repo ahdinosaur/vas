@@ -44,7 +44,6 @@
     "mock-xmlhttprequest": "^1.1.0",
     "npm-run-all": "^1.8.0",
     "object-values": "^1.0.0",
-    "pull-xhr": "^1.0.6",
     "standard": "^7.1.2",
     "tap-diff": "^0.1.1",
     "tape": "^4.6.3"
@@ -54,9 +53,12 @@
     "es2040": "^1.2.4",
     "get-in": "^3.0.1",
     "pull-defer": "^0.2.2",
+    "pull-json-doubleline": "^2.0.0",
     "pull-pushable": "^2.0.1",
     "pull-stream": "^3.5.0",
+    "pull-xhr": "^1.0.6",
     "set-in": "^2.0.0",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "xtend": "^4.0.1"
   }
 }
