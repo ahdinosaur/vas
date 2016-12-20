@@ -14,12 +14,9 @@ const service = {
     }
 
     function all () {
-      const things = values(config.data)
-      return pull.values(things)
     }
 
     function get (id, cb) {
-      cb(null, config.data[id])
     }
   }
 }
@@ -37,7 +34,7 @@ test('server object has keys source and sink which are functions', function (t) 
   t.end()
 })
 
-test('Server calls the init function in the service object', function(t) {
+test('Server calls the init function in the service object', function (t) {
   const service = {
     init: function (config) {
       t.ok(true)
@@ -47,14 +44,14 @@ test('Server calls the init function in the service object', function(t) {
   Server(service)
 })
 
-test('Server passes the config object to the init function', function(t) {
+test('Server passes the config object to the init function', function (t) {
   const config = {
     data: {
       1: 'human',
       2: 'computer',
       3: 'JavaScript'
     }
-  } 
+  }
   const service = {
     init: function (initConfig) {
       t.equal(initConfig, config)
@@ -63,3 +60,4 @@ test('Server passes the config object to the init function', function(t) {
   }
   Server(service, config)
 })
+
