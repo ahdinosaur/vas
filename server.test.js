@@ -24,16 +24,6 @@ const service = {
   }
 }
 
-// could also attach db connection, file descriptors, etc.
-const config = {
-  data: {
-    1: 'human',
-    2: 'computer',
-    3: 'JavaScript'
-  }
-}
-
-
 test('Server returns an object  ', function (t) {
   const server = Server(service)
   t.equal(typeof server, 'object', 'Server return an object')
@@ -48,20 +38,27 @@ test('server object has keys source and sink which are functions', function (t) 
 })
 
 test('Server calls the init function in the service object', function(t) {
-  t.plan(1)
   const service = {
     init: function (config) {
       t.ok(true)
+      t.end()
     }
   }
-  Server(service, config)
+  Server(service)
 })
 
 test('Server passes the config object to the init function', function(t) {
-  t.plan(1)
+  const config = {
+    data: {
+      1: 'human',
+      2: 'computer',
+      3: 'JavaScript'
+    }
+  } 
   const service = {
     init: function (initConfig) {
       t.equal(initConfig, config)
+      t.end()
     }
   }
   Server(service, config)
