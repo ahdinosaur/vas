@@ -4,7 +4,6 @@ const extend = require('xtend')
 const pull = require('pull-stream/pull')
 const drain = require('pull-stream/sinks/drain')
 const Pushable = require('pull-pushable')
-const pullCat = require('pull-cat')
 const pullXhr = require('pull-xhr')
 
 const is = require('../lib/is')
@@ -57,19 +56,16 @@ function createHttpConnection (options = {}) {
           extend(xhrOpts, { json: args }),
           cb
         )
-        break;
+        break
       case 'source':
         pull(
           pullXhr.source(xhrOpts),
           serialize.parse(),
           drain(resolve)
         )
-        break;
+        break
       case 'sink':
         const requestStream = Pushable()
-        const response = extend(request, {
-          stream: drain(requestStream)
-        })
         requestStream.push(args)
         xhrOpts.method = 'POST'
         pull(
