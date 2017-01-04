@@ -1,7 +1,8 @@
 module.exports = {
-  Server: require('./server'),
-  Client: require('./client'),
-  defaults: require('./defaults'),
-  http: require('./http'),
+  Service: require('./service'),
+  // Client: require('./client'),
+  // defaults: require('./defaults'),
+  // http: require('./http'),
+  combine: require('./combine'),
   pull: require('pull-stream')
 }
