@@ -1,4 +1,6 @@
-const { Service, combine, pull } = require('./')
+const vas = require('./')
+const combine = require('depject')
+const pull = require('pull-stream')
 const values = require('object-values')
 
 const data = {
@@ -10,7 +12,7 @@ const data = {
   })
 }
 
-const things = Service({
+const things = vas.Service({
   name: 'things',
   needs: {
     data: 'first'
@@ -37,21 +39,24 @@ const things = Service({
   }
 })
 
-const services = { things }
+const modules = { data, things, vasModules: vas.modules }
 
-// const api = combine(services, driver, { data })
-const api = combine(services, { data })
+module.exports = modules
 
-api.things.get(1, (err, value) => {
-  if (err) throw err
-  console.log('get', value)
-  // get human
-})
+if (!module.parent) {
+  const api = vas.entry(combine(modules))
 
-pull(
-  api.things.all(),
-  pull.drain(v => console.log('all', v))
-)
-// all human
-// all computer
-// all JavaScript
+  api.things.get(1, (err, value) => {
+    if (err) throw err
+    console.log('get', value)
+    // get human
+  })
+
+  pull(
+    api.things.all(),
+    pull.drain(v => console.log('all', v))
+  )
+  // all human
+  // all computer
+  // all JavaScript
+}

@@ -51,10 +51,12 @@
   "dependencies": {
     "aspects": "^1.0.2",
     "deep-assign": "^2.0.0",
-    "depject": "github:ahdinosaur/depject#dep-order",
+    "depject": "github:pietgeursen/depject#refactor",
     "es2040": "^1.2.4",
     "libnested": "^1.1.0",
     "object-assign": "^4.1.0",
-    "pull-stream": "^3.5.0"
+    "pino": "^3.1.1",
+    "pull-stream": "^3.5.0",
+    "stack": "^0.1.0"
   }
 }
