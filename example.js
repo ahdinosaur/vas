@@ -1,50 +1,55 @@
-const { Server, Client, pull } = require('./')
+const { Service, combine, pull } = require('./')
 const values = require('object-values')
 
-const service = {
+const data = {
+  gives: 'data',
+  create: () => () => ({
+    1: 'human',
+    2: 'computer',
+    3: 'JavaScript'
+  })
+}
+
+const things = Service({
   name: 'things',
+  needs: {
+    data: 'first'
+  },
   manifest: {
     all: 'source',
     get: 'async'
   },
-  init: function (config) {
+  create: function (api) {
+    const data = api.data()
+
     return {
       methods: { all, get }
     }
 
     function all () {
-      const things = values(config.data)
+      const things = values(data)
       return pull.values(things)
     }
 
     function get (id, cb) {
-      cb(null, config.data[id])
+      cb(null, data[id])
     }
   }
-}
+})
 
-// could also attach db connection, file descriptors, etc.
-const config = {
-  data: {
-    1: 'human',
-    2: 'computer',
-    3: 'JavaScript'
-  }
-}
+const services = { things }
 
-const server = Server(service, config)
-const client = Client(service, config)
+// const api = combine(services, driver, { data })
+const api = combine(services, { data })
 
-pull(client, server, client)
-
-client.things.get(1, (err, value) => {
+api.things.get(1, (err, value) => {
   if (err) throw err
   console.log('get', value)
   // get human
 })
 
 pull(
-  client.things.all(),
+  api.things.all(),
   pull.drain(v => console.log('all', v))
 )
 // all human
