@@ -7,7 +7,7 @@
   "scripts": {
     "test:deps": "dependency-check . && dependency-check . --extra --no-dev -i es2040",
     "test:lint": "standard",
-    "test:node": "NODE_ENV=test bin/test",
+    "test:node": "NODE_ENV=test tape **/*.test.js",
     "test:coverage": "NODE_ENV=test istanbul cover ./test.js",
     "test": "npm-run-all -s test:deps test:lint test:node"
   },
