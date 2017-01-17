@@ -27,13 +27,14 @@ module.exports = {
           stream: () => process.stdout
         }
       },
-      log: (level, a, b, c, d, e, f, g, h, i, j) => {
+      log: () => {
         if (log === undefined) {
           const { level, stream } = api.config.log
-          log = Log({ level: level() }, stream())
+          log = Log({
+            level: level()
+          }, stream())
         }
-        log[level](a, b, c, d, e, f, g, h, i, j)
-        return true
+        return log
       }
     }
   }

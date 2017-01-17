@@ -53,10 +53,13 @@
     "deep-assign": "^2.0.0",
     "depject": "github:pietgeursen/depject#refactor",
     "es2040": "^1.2.4",
+    "explain-error": "^1.0.3",
     "libnested": "^1.1.0",
     "object-assign": "^4.1.0",
     "pino": "^3.1.1",
     "pull-stream": "^3.5.0",
-    "stack": "^0.1.0"
+    "query-string": "^4.3.1",
+    "server-sink": "^1.0.0",
+    "stream-to-pull-stream": "^1.7.2"
   }
 }
