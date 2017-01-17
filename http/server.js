@@ -6,10 +6,17 @@ const assign = require('object-assign')
 const deepAssign = require('deep-assign')
 const queryString = require('query-string')
 const explain = require('explain-error')
-const toPull = require('stream-to-pull-stream')
+const toNodeStream = require('pull-stream-to-stream')
 const serverSink = require('server-sink')
+const Boom = require('boom')
+const assert = require('assert')
+const pump = require('pump')
+const jsonParse = require('fast-json-parse')
+const jsonStringify = require('fast-safe-stringify')
+const stringToNodeStream = require('from2-string')
 
 const abort = require('../lib/abort')
+const is = require('../lib/is')
 
 module.exports = {
   needs: {
@@ -25,10 +32,15 @@ module.exports = {
       handler: 'first',
       manifest: 'map',
       http: {
+        createError: 'first',
         createServer: 'first',
+        createStack: 'first',
+        errorHandler: 'first',
+        notFoundHandler: 'first',
         handler: 'map',
         server: 'first',
-        wrapHandler: 'reduce'
+        wrapError: 'first',
+        valueHandler: 'first'
       }
     }
   },
@@ -43,10 +55,15 @@ module.exports = {
     vas: {
       start: true,
       http: { 
+        createStack: true,
+        createError: true,
         createServer: true,
+        errorHandler: true,
+        notFoundHandler: true,
         handler: true,
         server: true,
-        wrapHandler: true
+        wrapError: true,
+        valueHandler: true
       }
     }
   },
@@ -59,10 +76,15 @@ module.exports = {
       vas: {
         start,
         http: {
+          createError,
           createServer,
+          createStack,
+          errorHandler,
+          notFoundHandler,
           handler,
           server,
-          wrapHandler
+          wrapError,
+          valueHandler
         }
       }
     }
@@ -75,12 +97,82 @@ module.exports = {
       return HttpHandler({
         handler: api.vas.handler,
         manifest: deepAssign(...api.vas.manifest())
-      })(req, res)
+      })
     }
     
-    function wrapHandler (handler) {
+    function errorHandler () {
+      return (req, res, err) => {
+        if (!err.isBoom) err = api.vas.http.wrapError(err)
+
+        var payload = err.output.payload
+        if (err.data) payload.data = err.data
+
+        const body = jsonStringify(payload)
+        const statusCode = err.output.statusCode ||
+          (res.statusCode >= 400 ? res.statusCode : 500)
+
+        res.statusCode = statusCode
+        res.end(body)
+      }
+    }
+
+    function valueHandler () {
       const log = api.log()
-      return wrapHttpHandler({ handler, log })
+      return (req, res, value) => {
+        var stream = null
+        if (is.nodeStream(value)) {
+          stream = value
+        } else if (is.source(value)) {
+          stream = toNodeStream(value)
+        } else if (is.object(value)) {
+          res.setHeader('Content-Type', 'application/json')
+          stream = stringToNodeStream(jsonStringify(value))
+        } else if (is.string(value)) {
+          stream = stringToNodeStream(value)
+        }
+        var sink = serverSink(req, res, function (msg) {
+          log.info(msg)
+        })
+        if (stream) {
+          pump(stream, sink)
+        } else {
+          sink.end()
+        }
+      }
+    }
+
+    function notFoundHandler () {
+      const err = Boom.notFound()
+      return (req, res, value) => {
+        api.vas.http.errorHandler(req, res, err)
+      }
+    }
+
+    // NOTE (mw) a curious idea is using a series
+    // of (req, res) => (nextReq, nextRes) => {} wrappers
+    // instead of the (req, req, next) => {} stack
+    // i wonder how well it would work.
+    // for now will defer to later.
+
+    function createStack (handlers) {
+      const valueHandler = api.vas.http.valueHandler()
+      const errorHandler = api.vas.http.errorHandler()
+      const notFoundHandler = api.vas.http.notFoundHandler()
+
+      var context = {}
+      var handle = notFoundHandler
+      handlers.reverse().forEach(function (handler) {
+        const child = handle
+        handle = function (req, res) {
+          handler(req, res, context, function (err, value) {
+            if (err) errorHandler(req, res, err)
+            else if (value) valueHandler(req, res, value)
+            else child(req, res)
+          })
+        }
+      })
+
+      return handle
     }
 
     function server () {
@@ -88,8 +180,8 @@ module.exports = {
       // provides a shared reference.
       if (!httpServer) {
         httpServer = api.vas.http.createServer(
-          api.vas.http.wrapHandler(
-            api.vas.http.handler
+          api.vas.http.createStack(
+            api.vas.http.handler()
           )
         )
       }
@@ -126,8 +218,7 @@ module.exports = {
 
 
 function HttpHandler ({ handler, manifest }) {
-  return (req, res) => {
-    console.log(req, res)
+  return (req, res, context, next) => {
     const url = Url.parse(req.headers.host + req.url)
     const path = url.pathname.split('/').slice(1)
     const type = N.get(manifest, path)
@@ -136,60 +227,25 @@ function HttpHandler ({ handler, manifest }) {
     try {
       const args = JSON.parse(params.args)
     } catch (err) {
-      return abort.source(explain(err, 'vas/http/server: error parsing JSON'))
+      return abort.source(explain(err, 'vas/http/server#httpHandler: error parsing JSON'))
     }
 
-    // const context = { id: req.id }
     const call = { type, path, args }
     console.log('call', call)
-    return pull.empty()
+    return pull.values(['hey!'])
   }
 }
 
-function wrapHttpHandler ({ handler, log }) {
-  return (nodeReq, nodeRes) => {
-    var req = toPull(nodeReq)
-    assign(req, {
-      url: nodeReq.url,
-      method: nodeReq.method,
-      headers: nodeReq.headers
-    })
-    var res = toPull(nodeRes)
-
-    var source = handler(req, res)
-
-    if (source.statusCode) {
-      nodeRes.statusCode = source.statusCode
-    }
-    if (source.headers) {
-      for (var key in source.headers) {
-        nodeRes.setHeader(key, source.headers[key])
-      }
-    }
-
-    // TODO replace with pure pull streams
-    var sink = toPull(serverSink(nodeReq, nodeRes, msg => {
-      log.info(msg)
-    }))
-
-    pull(source, sink)
-  }
+function createError (opts) {
+  assert.equal(typeof opts, 'object', 'vas/http/server#createError: opts should be type object')
+  const { statusCode, message, data } = options
+  assert.equal(typeof statusCode, 'number', 'vas/http/server#createError: statusCode should be type number')
+  return Boom.create(statusCode, message, data)
 }
 
-function Stack (layers, errorHandler) {
-  var handle = errorHandler
-  layers.reverse().forEach(function (layer) {
-    var child = handle
-    handle = function (req, res) {
-      try {
-        layer(req, res, function (err) {
-          if (err) errorHandler(req, res, err)
-          else child(req, res)
-        })
-      } catch (err) {
-        errorHandler(req, res, err)
-      }
-    }
-  })
-  return handle
+function wrapError (err, options = {}) {
+  assert.equal(typeof err, 'object', 'vas/http/server#wrapError: err should be type object')
+  assert.equal(typeof options, 'object', 'vas/http/server#wrapError: opts should be type object')
+  const { statusCode, message } = options
+  return Boom.wrap(err, statusCode, message)
 }

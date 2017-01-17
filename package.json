@@ -50,16 +50,22 @@
   },
   "dependencies": {
     "aspects": "^1.0.2",
+    "boom": "^4.2.0",
     "deep-assign": "^2.0.0",
     "depject": "github:pietgeursen/depject#refactor",
     "es2040": "^1.2.4",
     "explain-error": "^1.0.3",
+    "fast-json-parse": "^1.0.2",
+    "fast-safe-stringify": "^1.1.3",
+    "from2-string": "^1.1.0",
+    "is-stream": "^1.1.0",
     "libnested": "^1.1.0",
     "object-assign": "^4.1.0",
     "pino": "^3.1.1",
     "pull-stream": "^3.5.0",
+    "pull-stream-to-stream": "^1.3.3",
+    "pump": "^1.0.2",
     "query-string": "^4.3.1",
-    "server-sink": "^1.0.0",
-    "stream-to-pull-stream": "^1.7.2"
+    "server-sink": "^1.0.0"
   }
 }
