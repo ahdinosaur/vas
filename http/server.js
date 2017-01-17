@@ -14,6 +14,8 @@ const pump = require('pump')
 const jsonParse = require('fast-json-parse')
 const jsonStringify = require('fast-safe-stringify')
 const stringToNodeStream = require('from2-string')
+const isNodeStream = require('is-stream')
+const isPull = require('is-pull-stream')
 
 const abort = require('../lib/abort')
 const is = require('../lib/is')
@@ -101,8 +103,11 @@ module.exports = {
     }
     
     function errorHandler () {
+      // code a re-image of https://github.com/yoshuawuyts/merry/blob/4aff6cbe29057b82a78e912239c341b478b8338a/index.js
+      const wrapError = api.vas.http.wrapError
+      const log = api.log()
       return (req, res, err) => {
-        if (!err.isBoom) err = api.vas.http.wrapError(err)
+        if (!err.isBoom) err = wrapError(err)
 
         var payload = err.output.payload
         if (err.data) payload.data = err.data
@@ -111,19 +116,24 @@ module.exports = {
         const statusCode = err.output.statusCode ||
           (res.statusCode >= 400 ? res.statusCode : 500)
 
+        if (statusCode === 500) {
+          log.warn(err)
+        }
+
         res.statusCode = statusCode
         res.end(body)
       }
     }
 
     function valueHandler () {
+      // code a re-image of https://github.com/yoshuawuyts/merry/blob/4aff6cbe29057b82a78e912239c341b478b8338a/index.js
       const log = api.log()
       return (req, res, value) => {
         var stream = null
-        if (is.nodeStream(value)) {
+        if (isNodeStream.readable(value)) {
           stream = value
-        } else if (is.source(value)) {
-          stream = toNodeStream(value)
+        } else if (isPull.isSource(value)) {
+          stream = toNodeStream.source(value)
         } else if (is.object(value)) {
           res.setHeader('Content-Type', 'application/json')
           stream = stringToNodeStream(jsonStringify(value))
@@ -142,6 +152,7 @@ module.exports = {
     }
 
     function notFoundHandler () {
+      // code a re-image of https://github.com/yoshuawuyts/merry/blob/4aff6cbe29057b82a78e912239c341b478b8338a/index.js
       const err = Boom.notFound()
       return (req, res, value) => {
         api.vas.http.errorHandler(req, res, err)
@@ -155,6 +166,7 @@ module.exports = {
     // for now will defer to later.
 
     function createStack (handlers) {
+      // code a re-image of https://github.com/creationix/stack
       const valueHandler = api.vas.http.valueHandler()
       const errorHandler = api.vas.http.errorHandler()
       const notFoundHandler = api.vas.http.notFoundHandler()
@@ -225,14 +237,15 @@ function HttpHandler ({ handler, manifest }) {
 
     const params = queryString.parse(url.query)
     try {
-      const args = JSON.parse(params.args)
+      var args = params.args ? JSON.parse(params.args) : []
     } catch (err) {
-      return abort.source(explain(err, 'vas/http/server#httpHandler: error parsing JSON'))
+      return next(explain(err, 'vas/http/server#httpHandler: error parsing JSON'))
     }
 
     const call = { type, path, args }
     console.log('call', call)
-    return pull.values(['hey!'])
+    const source = pull.values(['hey!'])
+    next(null, source)
   }
 }
 
