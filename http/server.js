@@ -13,12 +13,16 @@ const assert = require('assert')
 const pump = require('pump')
 const jsonParse = require('fast-json-parse')
 const jsonStringify = require('fast-safe-stringify')
+const pullJson = require('pull-json-doubleline')
 const stringToNodeStream = require('from2-string')
 const isNodeStream = require('is-stream')
 const isPull = require('is-pull-stream')
+const Route = require('http-routes')
+const compose = require('http-compose')
 
 const abort = require('../lib/abort')
 const is = require('../lib/is')
+const eachManifest = require('../lib/eachManifest')
 
 module.exports = {
   needs: {
@@ -172,20 +176,15 @@ module.exports = {
       const errorHandler = api.vas.http.errorHandler()
       const notFoundHandler = api.vas.http.notFoundHandler()
 
-      var context = {}
-      var handle = notFoundHandler
-      handlers.reverse().forEach(function (handler) {
-        const child = handle
-        handle = function (req, res) {
-          handler(req, res, context, function (err, value) {
-            if (err) errorHandler(req, res, err)
-            else if (value) valueHandler(req, res, value)
-            else child(req, res)
-          })
-        }
-      })
+      const handler = compose(handlers)
 
-      return handle
+      return (req, res) => {
+        handler(req, res, {}, (err, value) => {
+          if (err) errorHandler(req, res, err)
+          else if (value) valueHandler(req, res, value)
+          else notFoundHandler(req, res)
+        })
+      }
     }
 
     function server () {
@@ -230,25 +229,48 @@ module.exports = {
 }
 
 
-function HttpHandler ({ handler, manifest, serialize }) {
-  return (req, res, context, next) => {
-    const url = Url.parse(req.headers.host + req.url)
-    const path = url.pathname.split('/').slice(1)
-    const type = N.get(manifest, path)
+function HttpHandler ({ handler, manifest }) {
+  var routes = []
+  eachManifest(manifest, (value, path) => {
+    const callManifest = N.get(manifest, path)
+    const {
+      type,
+      path: callPath = path,
+      responseType = 'json'
+    } = callManifest
 
-    const params = queryString.parse(url.query)
-    try {
-      var args = params.args ? JSON.parse(params.args) : []
-    } catch (err) {
-      return next(explain(err, 'vas/http/server#httpHandler: error parsing JSON'))
-    }
+    console.log('callPath', callPath)
+    const urlPath = '/' + callPath.join('/')
+    const route = [urlPath, (req, res, context, next) => {
+      const queryParams = queryString.parse(context.url.query)
+      const params = assign({}, context.params, queryParams)
 
-    const call = { type, path, args }
-    console.log('call', call)
-    const value = handler(call)
-    if (is.request(type)) value(next)
-    else next(null, value)
-  }
+      try {
+        var args = params.args ? JSON.parse(params.args) : []
+      } catch (err) {
+        return next(explain(err, 'error parsing JSON in query string'))
+      }
+
+      const call = { type, path, args }
+      var value = handler(call)
+
+      if (is.requestType(type)) value(next)
+      else if (is.streamType(type)) {
+        if (is.sourceType(type)) {
+          if (responseType === 'json') {
+            value = pull(
+              value,
+              pull.map(value => ({ value })),
+              pullJson.stringify()
+            )
+          }
+        }
+        next(null, value)
+      }
+    }]
+    routes.push(route)
+  })
+  return Route(routes)
 }
 
 function createError (opts) {

@@ -33,8 +33,8 @@ const things = vas.Service({
       return pull.values(things)
     }
 
-    function get (id, cb) {
-      cb(null, data[id])
+    function get (id) {
+      return cb => cb(null, data[id])
     }
   }
 })
