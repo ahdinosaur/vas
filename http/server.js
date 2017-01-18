@@ -154,8 +154,9 @@ module.exports = {
     function notFoundHandler () {
       // code a re-image of https://github.com/yoshuawuyts/merry/blob/4aff6cbe29057b82a78e912239c341b478b8338a/index.js
       const err = Boom.notFound()
-      return (req, res, value) => {
-        api.vas.http.errorHandler(req, res, err)
+      const errorHandler = api.vas.http.errorHandler()
+      return (req, res) => {
+        errorHandler(req, res, err)
       }
     }
 
@@ -229,7 +230,7 @@ module.exports = {
 }
 
 
-function HttpHandler ({ handler, manifest }) {
+function HttpHandler ({ handler, manifest, serialize }) {
   return (req, res, context, next) => {
     const url = Url.parse(req.headers.host + req.url)
     const path = url.pathname.split('/').slice(1)
@@ -244,8 +245,9 @@ function HttpHandler ({ handler, manifest }) {
 
     const call = { type, path, args }
     console.log('call', call)
-    const source = pull.values(['hey!'])
-    next(null, source)
+    const value = handler(call)
+    if (is.request(type)) value(next)
+    else next(null, value)
   }
 }
 

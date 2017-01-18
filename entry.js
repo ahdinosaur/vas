@@ -1,13 +1,13 @@
 const apply = require('depject/apply')
-const deepAssign = require('deep-assign')
 
-const emitter = require('./lib/emitter')
+const Emitter = require('./lib/emitter')
+const mergeManifests = require('./lib/mergeManifests')
 
 module.exports = entry
 
 function entry (combinedModules) {
   const manifests = apply.map(combinedModules.vas.manifest)()
-  const manifest = deepAssign(...manifests)
+  const manifest = mergeManifests(...manifests)
   const handler = apply.first(combinedModules.vas.handler)
-  return emitter({ manifest, handler })
+  return Emitter({ manifest, handler })
 }
