@@ -113,8 +113,17 @@ module.exports = {
       return (req, res, err) => {
         if (!err.isBoom) err = wrapError(err)
 
-        var payload = err.output.payload
-        if (err.data) payload.data = err.data
+        const payload = err.output.payload
+        // reformat to be consistent with streaming value output.
+        var output = {
+          error: {
+            statusCode: payload.statusCode,
+            name: payload.error,
+            message: payload.message,
+            data: err.data
+          }
+        }
+        if (err.data) output.error.data = err.data
 
         const body = jsonStringify(payload)
         const statusCode = err.output.statusCode ||
@@ -132,6 +141,8 @@ module.exports = {
     function valueHandler () {
       // code a re-image of https://github.com/yoshuawuyts/merry/blob/4aff6cbe29057b82a78e912239c341b478b8338a/index.js
       const log = api.log()
+      const errorHandler = api.vas.http.errorHandler()
+
       return (req, res, value) => {
         var stream = null
         if (isNodeStream.readable(value)) {
@@ -139,16 +150,18 @@ module.exports = {
         } else if (isPull.isSource(value)) {
           stream = toNodeStream.source(value)
         } else if (is.object(value)) {
-          res.setHeader('Content-Type', 'application/json')
+          if (!res.getHeader('content-type')) {
+            res.setHeader('content-type', 'application/json')
+          }
           stream = stringToNodeStream(jsonStringify(value))
         } else if (is.string(value)) {
           stream = stringToNodeStream(value)
         }
-        var sink = serverSink(req, res, function (msg) {
-          log.info(msg)
-        })
+        var sink = serverSink(req, res, msg => log.info(msg))
         if (stream) {
-          pump(stream, sink)
+          pump(stream, sink, err => {
+            if (err) errorHandler(req, res, err)
+          })
         } else {
           sink.end()
         }
@@ -236,10 +249,15 @@ function HttpHandler ({ handler, manifest }) {
     const {
       type,
       path: callPath = path,
-      responseType = 'json'
+      responseType = 'json',
+      statusCode
     } = callManifest
 
-    console.log('callPath', callPath)
+    var responseHeaders = {}
+    for (const key in callManifest.responseHeaders) {
+      responseHeaders[key.toLowerCase()] = callManifest.responseHeaders[key]
+    }
+
     const urlPath = '/' + callPath.join('/')
     const route = [urlPath, (req, res, context, next) => {
       const queryParams = queryString.parse(context.url.query)
@@ -254,14 +272,43 @@ function HttpHandler ({ handler, manifest }) {
       const call = { type, path, args }
       var value = handler(call)
 
-      if (is.requestType(type)) value(next)
+      for (const key in responseHeaders) {
+        res.setHeader(key, responseHeaders[key])
+      }
+      
+      if (statusCode) {
+        res.statusCode = statusCode
+      }
+
+      if (is.requestType(type)) {
+        value((err, value) => {
+          if (err) next(err)
+          else next(null, { value })
+        })
+      }
       else if (is.streamType(type)) {
         if (is.sourceType(type)) {
           if (responseType === 'json') {
+            if (responseHeaders['content-type'] === undefined) {
+              res.setHeader('Content-Type', 'application/json; boundary=NLNL')
+            }
             value = pull(
               value,
               pull.map(value => ({ value })),
               pullJson.stringify()
+            )
+          } else if (responseType === 'blob') {
+            value = pull(
+              value,
+              responseHeaders['content-type'] === undefined
+                ? identify(function (filetype) {
+                  if (filetype) {
+                    res.setHeader('content-type', mime.lookup(filetype))
+                  } else {
+                    res.setHeader('content-type', 'application/octet-stream')
+                  }
+                })
+                : pull.through()
             )
           }
         }
