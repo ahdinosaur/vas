@@ -248,29 +248,34 @@ function HttpHandler ({ handler, manifest }) {
     const callManifest = N.get(manifest, path)
     const {
       type,
-      path: callPath = path,
+      http: httpManifest = {}
+    } = callManifest
+    const {
+      route: routePath = '/' + path.join('/'),
       responseType = 'json',
       statusCode
-    } = callManifest
+    } = httpManifest
 
     var responseHeaders = {}
-    for (const key in callManifest.responseHeaders) {
-      responseHeaders[key.toLowerCase()] = callManifest.responseHeaders[key]
+    for (const key in httpManifest.responseHeaders) {
+      responseHeaders[key.toLowerCase()] = httpManifest.responseHeaders[key]
     }
 
-    const urlPath = '/' + callPath.join('/')
-    const route = [urlPath, (req, res, context, next) => {
-      const queryParams = queryString.parse(context.url.query)
-      const params = assign({}, context.params, queryParams)
-
+    const route = [routePath, (req, res, context, next) => {
+      var queryParams = queryString.parse(context.url.query)
       try {
-        var args = params.args ? JSON.parse(params.args) : []
+        for (const key in queryParams) {
+          queryParams[key] = JSON.parse(queryParams[key])
+        }
       } catch (err) {
         return next(explain(err, 'error parsing JSON in query string'))
       }
+      const routeParams = context.params
 
-      const call = { type, path, args }
-      var value = handler(call)
+      const options = assign({}, routeParams, queryParams)
+
+      const call = { type, path, options }
+      const continuableOrStream = handler(call)
 
       for (const key in responseHeaders) {
         res.setHeader(key, responseHeaders[key])
@@ -281,25 +286,27 @@ function HttpHandler ({ handler, manifest }) {
       }
 
       if (is.requestType(type)) {
-        value((err, value) => {
+        const continuable = continuableOrStream
+        continuable((err, value = null) => {
           if (err) next(err)
           else next(null, { value })
         })
       }
       else if (is.streamType(type)) {
+        var stream = continuableOrStream
         if (is.sourceType(type)) {
           if (responseType === 'json') {
             if (responseHeaders['content-type'] === undefined) {
               res.setHeader('Content-Type', 'application/json; boundary=NLNL')
             }
-            value = pull(
-              value,
+            stream = pull(
+              stream,
               pull.map(value => ({ value })),
               pullJson.stringify()
             )
           } else if (responseType === 'blob') {
-            value = pull(
-              value,
+            stream = pull(
+              stream,
               responseHeaders['content-type'] === undefined
                 ? identify(function (filetype) {
                   if (filetype) {
@@ -312,7 +319,7 @@ function HttpHandler ({ handler, manifest }) {
             )
           }
         }
-        next(null, value)
+        next(null, stream)
       }
     }]
     routes.push(route)

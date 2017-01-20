@@ -5,8 +5,8 @@
   "main": "index.js",
   "browser": "browser.js",
   "scripts": {
-    "example": "node-dev example",
-    "example:http": "node-dev http/example",
+    "example": "node-dev example | pino",
+    "example:http": "node-dev http/example | pino",
     "test:deps": "dependency-check . && dependency-check . --extra --no-dev -i es2040",
     "test:lint": "standard",
     "test:node": "NODE_ENV=test bin/test",

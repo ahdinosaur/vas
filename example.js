@@ -19,13 +19,13 @@ const things = vas.Service({
   },
   manifest: {
     all: 'source',
-    get: 'async'
+    get: 'async',
   },
   create: function (api) {
     const data = api.data()
 
     return {
-      methods: { all, get }
+      methods: { all, get },
     }
 
     function all () {
@@ -33,8 +33,8 @@ const things = vas.Service({
       return pull.values(things)
     }
 
-    function get (id) {
-      return cb => cb(null, data[id])
+    function get ({ id }, cb) {
+      cb(null, data[id])
     }
   }
 })
