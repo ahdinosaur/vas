@@ -19,13 +19,13 @@ const things = vas.Service({
   },
   manifest: {
     all: 'source',
-    get: 'async',
+    get: 'async'
   },
   create: function (api) {
     const data = api.data()
 
     return {
-      methods: { all, get },
+      methods: { all, get }
     }
 
     function all () {

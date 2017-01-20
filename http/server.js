@@ -1,5 +1,4 @@
 const http = require('http')
-const Url = require('url')
 const pull = require('pull-stream')
 const N = require('libnested')
 const assign = require('object-assign')
@@ -11,7 +10,8 @@ const serverSink = require('server-sink')
 const Boom = require('boom')
 const assert = require('assert')
 const pump = require('pump')
-const jsonParse = require('fast-json-parse')
+const identify = require('pull-identify-filetype')
+const mime = require('mime-types')
 const jsonStringify = require('fast-safe-stringify')
 const pullJson = require('pull-json-doubleline')
 const stringToNodeStream = require('from2-string')
@@ -20,7 +20,6 @@ const isPull = require('is-pull-stream')
 const Route = require('http-routes')
 const compose = require('http-compose')
 
-const abort = require('../lib/abort')
 const is = require('../lib/is')
 const eachManifest = require('../lib/eachManifest')
 
@@ -60,7 +59,7 @@ module.exports = {
     },
     vas: {
       start: true,
-      http: { 
+      http: {
         createStack: true,
         createError: true,
         createServer: true,
@@ -105,7 +104,7 @@ module.exports = {
         manifest: deepAssign(...api.vas.manifest())
       })
     }
-    
+
     function errorHandler () {
       // code a re-image of https://github.com/yoshuawuyts/merry/blob/4aff6cbe29057b82a78e912239c341b478b8338a/index.js
       const wrapError = api.vas.http.wrapError
@@ -241,7 +240,6 @@ module.exports = {
   }
 }
 
-
 function HttpHandler ({ handler, manifest }) {
   var routes = []
   eachManifest(manifest, (value, path) => {
@@ -280,7 +278,7 @@ function HttpHandler ({ handler, manifest }) {
       for (const key in responseHeaders) {
         res.setHeader(key, responseHeaders[key])
       }
-      
+
       if (statusCode) {
         res.statusCode = statusCode
       }
@@ -291,8 +289,7 @@ function HttpHandler ({ handler, manifest }) {
           if (err) next(err)
           else next(null, { value })
         })
-      }
-      else if (is.streamType(type)) {
+      } else if (is.streamType(type)) {
         var stream = continuableOrStream
         if (is.sourceType(type)) {
           if (responseType === 'json') {
@@ -327,8 +324,8 @@ function HttpHandler ({ handler, manifest }) {
   return Route(routes)
 }
 
-function createError (opts) {
-  assert.equal(typeof opts, 'object', 'vas/http/server#createError: opts should be type object')
+function createError (options) {
+  assert.equal(typeof options, 'object', 'vas/http/server#createError: opts should be type object')
   const { statusCode, message, data } = options
   assert.equal(typeof statusCode, 'number', 'vas/http/server#createError: statusCode should be type number')
   return Boom.create(statusCode, message, data)

@@ -1,13 +1,15 @@
 const test = require('tape')
+const combine = require('depject')
+const pull = require('pull-stream')
 const values = require('object-values')
 
-const { Service/*, Client*/, combine, pull } = require('./')
+const { Service/*, Client */, entry, modules } = require('./')
 
 test('vas exports Server, Client, combine and pull functions', function (t) {
   t.equal(typeof Service, 'function', 'Service is a function')
   // t.equal(typeof Client, 'function', 'Client is a function')
-  t.equal(typeof combine, 'function', 'combine is a function')
-  t.equal(typeof pull, 'function', 'pull is a function')
+  t.equal(typeof entry, 'function', 'entry is a function')
+  t.equal(typeof modules, 'object', 'modules is a function')
   t.end()
 })
 
@@ -52,7 +54,8 @@ test('hello world example works', function (t) {
     }
   })
 
-  const api = combine({ things, dataModule })
+  const combinedModules = combine({ dataModule, things })
+  const api = entry(combinedModules)
 
   api.things.get(1, (err, value) => {
     t.error(err)
