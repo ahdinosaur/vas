@@ -1,6 +1,7 @@
 const vas = require('./')
 const combine = require('depject')
 const pull = require('pull-stream')
+const Log = require('catstack-log')
 const values = require('object-values')
 
 const data = {
@@ -39,7 +40,7 @@ const things = vas.Service({
   }
 })
 
-const modules = { data, things, vasModules: vas.modules }
+const modules = { data, things, Log }
 
 module.exports = modules
 

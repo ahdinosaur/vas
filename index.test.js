@@ -3,13 +3,12 @@ const combine = require('depject')
 const pull = require('pull-stream')
 const values = require('object-values')
 
-const { Service/*, Client */, entry, modules } = require('./')
+const { Service/*, Client */, entry } = require('./')
 
 test('vas exports Server, Client, combine and pull functions', function (t) {
   t.equal(typeof Service, 'function', 'Service is a function')
   // t.equal(typeof Client, 'function', 'Client is a function')
   t.equal(typeof entry, 'function', 'entry is a function')
-  t.equal(typeof modules, 'object', 'modules is a function')
   t.end()
 })
 
