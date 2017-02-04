@@ -6,11 +6,11 @@
   "browser": "browser.js",
   "scripts": {
     "example": "node-dev example | pino",
-    "example:http": "node-dev http/example | pino",
     "test:deps": "dependency-check . && dependency-check . --extra --no-dev -i es2040",
     "test:lint": "standard",
     "test:node": "NODE_ENV=test bin/test",
-    "test:coverage": "NODE_ENV=test npm run test:node",
+    "test:coverage": "NODE_ENV=test nyc npm run test:node",
+    "test:coverage:report": "NODE_ENV=test nyc report --reporter=lcov npm run test:node",
     "test": "npm-run-all -s test:deps test:lint test:node"
   },
   "browserify": {
@@ -41,9 +41,9 @@
   "homepage": "https://github.com/ahdinosaur/vas#readme",
   "devDependencies": {
     "bulk-require": "^1.0.0",
+    "catstack-log": "github:catstack/catstack-log",
     "dependency-check": "^2.6.0",
     "depject": "^3.1.4",
-    "mock-xmlhttprequest": "github:ahdinosaur/mock-xmlhttprequest",
     "node-dev": "^3.1.3",
     "npm-run-all": "^1.8.0",
     "nyc": "^10.1.2",
@@ -54,26 +54,9 @@
   },
   "dependencies": {
     "aspects": "^1.0.2",
-    "boom": "^4.2.0",
     "deep-assign": "^2.0.0",
     "es2040": "^1.2.4",
-    "explain-error": "^1.0.3",
-    "fast-safe-stringify": "^1.1.3",
-    "from2-string": "^1.1.0",
-    "http-compose": "^1.0.1",
-    "http-routes": "github:ahdinosaur/http-routes#v3",
-    "is-pull-stream": "0.0.0",
-    "is-stream": "^1.1.0",
     "libnested": "^1.1.0",
-    "mime-types": "^2.1.14",
-    "object-assign": "^4.1.0",
-    "pino": "^3.1.1",
-    "pull-identify-filetype": "^1.1.0",
-    "pull-json-doubleline": "^2.0.0",
-    "pull-stream": "^3.5.0",
-    "pull-stream-to-stream": "^1.3.3",
-    "pump": "^1.0.2",
-    "query-string": "^4.3.1",
-    "server-sink": "^1.0.0"
+    "object-assign": "^4.1.0"
   }
 }
