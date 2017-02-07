@@ -72,62 +72,49 @@ TODO
 ## example
 
 ```js
-const { Server, Client, pull } = require('vas')
+const vas = require('vas')
+const pull = require('pull-stream')
 const values = require('object-values')
 
-const service = {
-  name: 'things',
+const data = {
+  1: 'human',
+  2: 'computer',
+  3: 'JavaScript'
+}
+
+const things = {
+  path: ['things'],
   manifest: {
     all: 'source',
     get: 'async'
   },
-  init: function (config) {
-    return {
-      methods: { all, get }
-    }
-
-    function all () {
-      const things = values(config.data)
+  methods: {
+    all: function () {
+      const things = values(data)
       return pull.values(things)
-    }
-
-    function get (id, cb) {
-      cb(null, config.data[id])
+    },
+    get: function ({ id }, cb) {
+      cb(null, data[id])
     }
   }
 }
 
-// could also attach db connection, file descriptors, etc.
-const config = {
-  data: {
-    1: 'human',
-    2: 'computer',
-    3: 'JavaScript'
-  }
-}
+const api = vas.create(vas.Service, [things])
 
-const server = Server(service, config)
-const client = Client(service, config)
-  
-pull(client, server, client)
-
-client.things.get(1, (err, value) => {
-  if(err) throw err
+api.things.get(1, (err, value) => {
+  if (err) throw err
   console.log('get', value)
   // get human
 })
 
 pull(
-  client.things.all(),
+  api.things.all(),
   pull.drain(v => console.log('all', v))
 )
 // all human
 // all computer
 // all JavaScript
 ```
-
-for a more complete example, see [./example](./example), which you can run with `npm run example` and query using command-line using `npm run example:cli -- things.find`.
-
 ## concepts
 
 let's say we're writing a todo app (so lame right).
@@ -196,76 +183,52 @@ together, this could become a _service_, complete with a name and version:
 
 ```js
 const service = {
-  name: 'todos',
+  path: ['todos'],
   version: '1.0.0',
   manifest,
   methods
 }
 ```
 
-what if we had multiple services that need to share some configuration, such as a single database connection?
-
-to do so, we want to pass a _config_ object to the service methods, in particular a function that receives the config and returns the method functions.
+// TODO hooks
 
 combine these concepts together and welcome to `vas`. :)
 
 ## usage
 
-a `vas` service is a definition for a duplex stream that responds to requests.
-
-a `vas` service is defined by an object with the following keys:
+a `vas` service definition is defined by an object with the following keys:
 
 - `name`: a string name
 - `version` (optional): a string semantic version
 - `manifest`: a manifest object mapping method names to strings representing the method type (`sync`, `async`, `source`, or `sink`)
-- `init`: a `(config, topService) => ({ methods, hooks })` pure function that returns
-  - `methods`: method functions.
-  - `hooks`: hooks which correspond to methods. each hook is an tuple of shape `[type, fn]`, where `type` is either [`around`, `before`, or `after`](https://github.com/ahdinosaur/aspects) and `fn` is an asynchronous function that accepts the same arguments as the method (and an additional callback if the method is not `async`).
-- `services`: any recursive sub-services
+- `methods`: method functions.
+- `hooks`: hooks which correspond to methods. each hook is an tuple of shape `[type, fn]`, where `type` is either [`around`, `before`, or `after`](https://github.com/ahdinosaur/aspects) and `fn` is an asynchronous function that accepts the same arguments as the method (and an additional callback if the method is not `async`).
 
-a `vas` service can refer to a single service or an `Array` of services
+a `vas` service is defined by an object with the following keys:
+
+- `manifest`: a manifest object as above but paths are prefixed with service definition path
+- `handler`: a function which receives `({ type, path, options })` and returns either a continuable or a stream.
 
 ### `vas = require('vas')`
 
 the top-level `vas` module is a grab bag of all `vas/*` modules.
 
-you can also require each module separately like `require('vas/server')`.
+you can also require each module separately like `require('vas/Server')`.
 
-### `vas.Server(service, config)`
+### `service = vas.Server(definition)`
 
-creates a `vas` server from the service definition and any arbitrary config object (which will be passed into any sub-service `.init()` function).
+creates a `vas` service from the server definition.
 
-a `server` is a duplex pull-stream where:
+### `service = vas.Client(definition)`
 
-- `sink`: receives request objects `{ path, args, req }`
-- `source`: sends response objects `{ type, value, error, stream, res }` with `value` or `error` is a callback method or `stream` is a stream method.
+creates a `vas` service from the client definition.
 
-### `vas.Client(service, config)`
+### `emitter = vas.create(Type, definitions)`
 
-creates a `vas` client from the service definition and any arbitrary config object (which will be passed into any sub-service `.init()` function).
+where `Type` is either `vas.Server` or `vas.Client`
 
-a `client` is a duplex pull-stream where:
-
-- `source`: sends request objects `{ path, args, req }`
-- `sink`: receives response objects `{ type, value, error, stream, res }` with `value` or `error` is a callback method or `stream` is a stream method.
-
-### `vas.pull(client, server, client)`
-
-`pull` is equivalent to `require('pull-stream')`.
-
-using `pull(client, server, client)` connects the client and server duplex streams together.
-
-## adapters
-
-TODO
-
-### `vas.http.listen(options)`
-
-returns a duplex stream to receive and send `vas` method responses and requests as http messages.
-
-### `vas.http.connect(options)`
-
-returns a duplex stream to send and receive `vas` method requests and responses as http messages.
+### `service = vas.combine(services)`
+### `emitter = vas.Emitter(service)`
 
 ## frequently asked questions (FAQ)
 

@@ -1,5 +1,5 @@
-const mapManifest = require('./mapManifest')
-const is = require('./is')
+const mapManifest = require('./lib/mapManifest')
+const is = require('./lib/is')
 
 module.exports = Emitter
 

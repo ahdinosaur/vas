@@ -5,7 +5,7 @@
   "main": "index.js",
   "browser": "browser.js",
   "scripts": {
-    "example": "node-dev example | pino",
+    "example": "node-dev example",
     "test:deps": "dependency-check . && dependency-check . --extra --no-dev -i es2040",
     "test:lint": "standard",
     "test:node": "NODE_ENV=test bin/test",
@@ -41,9 +41,7 @@
   "homepage": "https://github.com/ahdinosaur/vas#readme",
   "devDependencies": {
     "bulk-require": "^1.0.0",
-    "catstack-log": "github:catstack/catstack-log",
     "dependency-check": "^2.6.0",
-    "depject": "^3.1.4",
     "node-dev": "^3.1.3",
     "npm-run-all": "^1.8.0",
     "nyc": "^10.1.2",
@@ -55,8 +53,8 @@
   "dependencies": {
     "aspects": "^1.0.2",
     "deep-assign": "^2.0.0",
+    "depject": "^3.1.4",
     "es2040": "^1.2.4",
-    "libnested": "^1.1.0",
-    "object-assign": "^4.1.0"
+    "libnested": "^1.1.0"
   }
 }
