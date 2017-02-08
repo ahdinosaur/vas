@@ -1,6 +1,6 @@
 module.exports = {
   Server: require('./Server'),
-  // Client: require('./client'),
+  Client: require('./Client'),
   combine: require('./combine'),
   Emitter: require('./Emitter')
 }

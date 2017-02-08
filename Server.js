@@ -1,20 +1,14 @@
-const { set } = require('libnested')
-
 const hookMethods = require('./lib/hookMethods')
 const Handler = require('./lib/Handler')
+const pathValue = require('./lib/pathValue')
 
 module.exports = Server
 
 function Server (definition) {
-  const { path, manifest, methods, hooks } = definition
-  const hookedMethods = hookMethods({ manifest, methods, hooks })
-  const handler = Handler({ path, methods: hookedMethods })
-  const pathedManifest = pathValue(path, manifest)
-  return { manifest: pathedManifest, handler }
-}
-
-function pathValue (path, value) {
-  var ret = {}
-  set(ret, path, value)
-  return ret
+  const { path, methods: defMethods, manifest: defManifest, hooks } = definition
+  const hookedMethods = hookMethods({ manifest: defManifest, methods: defMethods, hooks })
+  const methods = pathValue(path, hookedMethods)
+  const manifest = pathValue(path, defManifest)
+  const handler = Handler({ methods })
+  return { manifest, handler }
 }

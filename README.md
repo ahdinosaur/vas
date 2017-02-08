@@ -203,11 +203,17 @@ a `vas` service definition is defined by an object with the following keys:
 - `manifest`: a manifest object mapping method names to strings representing the method type (`sync`, `async`, `source`, or `sink`)
 - `methods`: method functions.
 - `hooks`: hooks which correspond to methods. each hook is an tuple of shape `[type, fn]`, where `type` is either [`around`, `before`, or `after`](https://github.com/ahdinosaur/aspects) and `fn` is an asynchronous function that accepts the same arguments as the method (and an additional callback if the method is not `async`).
+- `adapter`: object where keys are names of adapters and values are options objects per method.
 
 a `vas` service is defined by an object with the following keys:
 
-- `manifest`: a manifest object as above but paths are prefixed with service definition path
 - `handler`: a function which receives `({ type, path, options })` and returns either a continuable or a stream.
+- `manifest`: a manifest object as above but paths are prefixed with service definition path.
+- `adapter`: an adapter object as above but paths are prefixed with service definition path.
+
+an `vas` adapter is a function of shape `({ manifest, options }) => handler`
+
+- where `adapter.name` must be defined and match keys in `definition.adapter` and `service.adapter`.
 
 ### `vas = require('vas')`
 
@@ -219,15 +225,19 @@ you can also require each module separately like `require('vas/Server')`.
 
 creates a `vas` service from the server definition.
 
-### `service = vas.Client(definition)`
+### `service = vas.Client(adapter, definition)`
 
-creates a `vas` service from the client definition.
-
-### `emitter = vas.create(Type, definitions)`
-
-where `Type` is either `vas.Server` or `vas.Client`
+creates a `vas` service from the adapter and client definition.
 
 ### `service = vas.combine(services)`
+
+combines many `vas` services into one.
+
+does this by:
+
+- deeply merging the `manifest` and `adapter` objects
+- calling each `handler` until the first that returns something
+
 ### `emitter = vas.Emitter(service)`
 
 ## frequently asked questions (FAQ)

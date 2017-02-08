@@ -4,17 +4,20 @@ const deepAssign = require('deep-assign')
 module.exports = combine
 module.exports.manifests = combineManifests
 module.exports.handlers = combineHandlers
+module.exports.adapters = combineAdapters
 
 function combine (services = []) {
-  const { manifests, handlers } = services.reduce((sofar, next) => {
+  const total = services.reduce((sofar, next) => {
     return {
       manifests: [...sofar.manifests, next.manifest],
-      handlers: [...sofar.handlers, next.handler]
+      handlers: [...sofar.handlers, next.handler],
+      adapters: [...sofar.adapters, next.adapter]
     }
-  }, { manifests: [], handlers: [] })
+  }, { manifests: [], handlers: [], adapters: [] })
   return {
-    manifest: combineManifests(manifests),
-    handler: combineHandlers(handlers)
+    manifest: combineManifests(total.manifests),
+    handler: combineHandlers(total.handlers),
+    adapter: combineAdapters(total.adapters)
   }
 }
 
@@ -24,4 +27,8 @@ function combineManifests (manifests = []) {
 
 function combineHandlers (handlers = []) {
   return first(handlers)
+}
+
+function combineAdapters (adapters = []) {
+  return deepAssign({}, ...adapters)
 }
