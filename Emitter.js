@@ -1,10 +1,11 @@
-const mapManifest = require('./lib/mapManifest')
+const { map } = require('libnested')
+
 const is = require('./lib/is')
 
 module.exports = Emitter
 
 function Emitter ({ manifest, handler }) {
-  return mapManifest(manifest, ({ type }, path) => {
+  return map(manifest, (type, path) => {
     return Emit({ handler, type, path })
   })
 }

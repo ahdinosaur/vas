@@ -25,7 +25,9 @@ const things = {
   }
 }
 
-const api = vas.start(vas.Server, [things])
+const definitions = [things]
+const services = definitions.map(vas.Server)
+const api = vas.Emitter(vas.combine(services))
 
 api.things.get(1, (err, value) => {
   if (err) throw err
