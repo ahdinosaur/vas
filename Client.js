@@ -5,9 +5,9 @@ module.exports = Client
 
 function Client (adapter, definition) {
   const { path, manifest: defManifest } = definition
-  const defOptions = get(definition, ['adapter', adapter.name]) || {}
+  const defAdapterOptions = get(definition, ['adapter', adapter.key]) || {}
   const manifest = pathValue(path, defManifest)
-  const options = pathValue(path, defOptions)
-  const handler = adapter({ manifest, options })
+  const adapterOptions = pathObjectValues(path, defAdapterOptions)
+  const handler = adapter({ manifest, adapter: adapterOptions })
   return { manifest, handler }
 }

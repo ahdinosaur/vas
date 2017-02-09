@@ -221,13 +221,19 @@ the top-level `vas` module is a grab bag of all `vas/*` modules.
 
 you can also require each module separately like `require('vas/Server')`.
 
-### `service = vas.Server(definition)`
+### `service = vas.Service(definition)`
 
 creates a `vas` service from the server definition.
 
 ### `service = vas.Client(adapter, definition)`
 
 creates a `vas` service from the adapter and client definition.
+
+### `server = vas.Server(adapter, service)`
+
+creates a "server" from the adapter and service.
+
+what a "server" is depends on the adapter.
 
 ### `service = vas.combine(services)`
 

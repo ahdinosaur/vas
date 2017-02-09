@@ -26,7 +26,7 @@ const things = {
 }
 
 const definitions = [things]
-const services = definitions.map(vas.Server)
+const services = definitions.map(vas.Service)
 const api = vas.Emitter(vas.combine(services))
 
 api.things.get(1, (err, value) => {

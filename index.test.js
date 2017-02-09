@@ -2,11 +2,12 @@ const test = require('tape')
 const pull = require('pull-stream')
 const values = require('object-values')
 
-const { Server, Client, combine, Emitter } = require('./')
+const { Service, Client, Server, combine, Emitter } = require('./')
 
-test('vas exports Server, Client, combine, and Emitter functions', function (t) {
-  t.equal(typeof Server, 'function', 'Server is a function')
+test('vas exports Service, Client, combine, and Emitter functions', function (t) {
+  t.equal(typeof Service, 'function', 'Service is a function')
   t.equal(typeof Client, 'function', 'Client is a function')
+  t.equal(typeof Server, 'function', 'Server is a function')
   t.equal(typeof combine, 'function', 'combine is a function')
   t.equal(typeof Emitter, 'function', 'Emitter is a function')
   t.end()
@@ -39,7 +40,7 @@ test('hello world example works', function (t) {
   }
 
   const definitions = [things]
-  const services = definitions.map(Server)
+  const services = definitions.map(Service)
   const api = Emitter(combine(services))
 
   api.things.get({ id: 1 }, (err, value) => {
