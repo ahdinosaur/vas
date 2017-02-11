@@ -332,7 +332,7 @@ const service = {
 ## install
 
 ```shell
-npm install --save vas
+npm install --save vas@pre-release
 ```
 
 ## inspiration
