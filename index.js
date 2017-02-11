@@ -1,5 +1,7 @@
 module.exports = {
-  Service: require('./service'),
-  // Client: require('./client'),
-  entry: require('./entry')
+  Service: require('./Service'),
+  Client: require('./Client'),
+  Server: require('./Server'),
+  combine: require('./combine'),
+  Emitter: require('./Emitter')
 }
