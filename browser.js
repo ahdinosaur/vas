@@ -1,5 +1,5 @@
 module.exports = {
-  createClient: require('./createClient'),
-  connect: require('./connect'),
-  pull: require('pull-stream')
+  Client: require('./Client'),
+  Emitter: require('./Emitter'),
+  combine: require('./combine')
 }

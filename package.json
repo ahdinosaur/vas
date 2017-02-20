@@ -1,24 +1,22 @@
 {
   "name": "vas",
-  "version": "2.1.0",
+  "version": "3.0.0-pre.1",
   "description": "simple composable data services using muxrpc",
   "main": "index.js",
   "browser": "browser.js",
   "scripts": {
-    "test:deps": "dependency-check . && dependency-check . --extra --no-dev",
+    "example": "node-dev example",
+    "test:deps": "dependency-check . && dependency-check . --extra --no-dev -i es2040",
     "test:lint": "standard",
-    "test:node": "NODE_ENV=test tape test/*.js",
-    "test:coverage": "NODE_ENV=test istanbul cover test",
-    "test": "npm-run-all -s test:deps test:lint test:node",
-    "example:server": "node-dev example/server.js",
-    "example:cli": "node-dev example/cli",
-    "example": "npm-run-all -p example:server",
-    "bundle": "browserify example -g envify -g uglifyify",
-    "build": "npm run --silent bundle -- -o example/bundle.js",
-    "disc": "npm run --silent bundle -- --full-paths | discify --open"
+    "test:node": "NODE_ENV=test bin/test",
+    "test:coverage": "NODE_ENV=test nyc npm run test:node",
+    "test:coverage:report": "NODE_ENV=test nyc report --reporter=lcov npm run test:node",
+    "test": "npm-run-all -s test:deps test:lint test:node"
   },
   "browserify": {
-    "transform": []
+    "transform": [
+      "es2040"
+    ]
   },
   "repository": {
     "type": "git",
@@ -42,29 +40,21 @@
   },
   "homepage": "https://github.com/ahdinosaur/vas#readme",
   "devDependencies": {
-    "browserify": "^13.0.0",
-    "dependency-check": "^2.5.1",
-    "disc": "^1.3.2",
-    "envify": "^3.4.0",
-    "evalify": "^2.0.0",
-    "gh-pages": "^0.11.0",
-    "istanbul": "^0.4.4",
+    "bulk-require": "^1.0.0",
+    "dependency-check": "^2.6.0",
     "node-dev": "^3.1.3",
-    "npm-run-all": "^1.6.0",
+    "npm-run-all": "^1.8.0",
+    "nyc": "^10.1.2",
+    "object-values": "^1.0.0",
     "standard": "^7.1.2",
-    "tape": "^4.6.0",
-    "uglifyify": "^3.0.1",
-    "watchify": "^3.7.0"
+    "tap-diff": "^0.1.1",
+    "tape": "^4.6.3"
   },
   "dependencies": {
-    "defined": "^1.0.0",
-    "get-in": "^2.0.0",
-    "muxrpc": "^6.3.3",
-    "muxrpcli": "^1.0.5",
-    "pull-serializer": "^0.3.2",
-    "pull-stream": "^3.4.3",
-    "pull-ws": "^3.2.3",
-    "set-in": "^2.0.0",
-    "stack": "^0.1.0"
+    "aspects": "^1.0.2",
+    "deep-assign": "^2.0.0",
+    "depject": "^3.1.4",
+    "es2040": "^1.2.4",
+    "libnested": "^1.1.0"
   }
 }

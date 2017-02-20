@@ -1,8 +1,7 @@
 module.exports = {
-  createServer: require('./createServer'),
-  createClient: require('./createClient'),
-  listen: require('./listen'),
-  connect: require('./connect'),
-  command: require('./command'),
-  pull: require('pull-stream')
+  Service: require('./Service'),
+  Client: require('./Client'),
+  Server: require('./Server'),
+  combine: require('./combine'),
+  Emitter: require('./Emitter')
 }
